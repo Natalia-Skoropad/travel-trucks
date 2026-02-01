@@ -1,0 +1,60 @@
+.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: #f1f1f2;
+
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.lg {
+  width: 44px;
+  height: 44px;
+}
+
+.md {
+  width: 40px;
+  height: 40px;
+}
+
+.icon {
+  width: 25px;
+  height: 25px;
+
+  fill: rgba(16, 24, 40, 0.7);
+
+  transition: fill 0.2s ease, transform 0.2s ease;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  background: rgba(228, 72, 72, 0.12);
+}
+
+.btn:hover .icon,
+.btn:focus-visible .icon {
+  fill: var(--button);
+  transform: scale(1.08);
+}
+
+.active {
+  background: #fbe2e2;
+  transform: scale(1.05);
+}
+
+.active .icon {
+  fill: var(--button);
+}

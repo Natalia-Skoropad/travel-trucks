@@ -1,0 +1,44 @@
+.section {
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+}
+
+.left {
+  width: 100%;
+}
+
+.panel {
+  padding-top: 44px;
+}
+
+.right {
+  width: 100%;
+}
+
+@media only screen and (min-width: 1440px) {
+  .section {
+    padding-bottom: 80px;
+  }
+
+  .inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .left,
+  .right {
+    min-width: 0;
+  }
+
+  .right {
+    padding-top: 93px;
+  }
+}

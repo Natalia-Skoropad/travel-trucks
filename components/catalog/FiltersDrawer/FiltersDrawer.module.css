@@ -1,0 +1,49 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 50;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.panel {
+  width: 100%;
+  max-width: 375px;
+  height: 100%;
+
+  background: var(--color-white, #fff);
+
+  padding: 20px;
+  overflow: auto;
+
+  box-shadow: -12px 0 30px rgba(0, 0, 0, 0.12);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--main);
+}
+
+.content {
+  padding-bottom: 24px;
+}
+
+@media only screen and (min-width: 768px) {
+  .panel {
+    max-width: 420px;
+    padding: 24px;
+  }
+}

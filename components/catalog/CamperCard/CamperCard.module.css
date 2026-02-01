@@ -1,0 +1,165 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 16px;
+  border-radius: 10px;
+
+  background: var(--color-white, #fff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.media {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+
+  background: rgba(0, 0, 0, 0.03);
+  aspect-ratio: 16 / 11;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fav {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  z-index: 10;
+
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  min-width: 0;
+
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--main);
+
+  white-space: normal;
+}
+
+.price {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.3;
+  color: var(--main);
+}
+
+.description {
+  margin: 0;
+
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.actions a {
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  .top {
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  .media {
+    flex: 0 0 265px;
+    aspect-ratio: 16 / 11;
+  }
+
+  .content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .title {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fav {
+    top: 16px;
+    right: 16px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .card {
+    padding: 24px;
+
+    display: grid;
+    grid-template-columns: 310px 1fr;
+    grid-template-rows: auto 1fr;
+    column-gap: 24px;
+    row-gap: 16px;
+
+    align-items: stretch;
+  }
+
+  .top {
+    display: contents;
+  }
+
+  .media {
+    grid-column: 1;
+    grid-row: 1 / -1;
+
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}

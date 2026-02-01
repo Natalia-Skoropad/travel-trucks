@@ -1,0 +1,202 @@
+.section {
+  width: 100%;
+}
+
+.card {
+  border: 1px solid var(--gray-light);
+  border-radius: 10px;
+  background: #fff;
+
+  padding: 24px 34px;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--main);
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--gray);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  position: relative;
+}
+
+.fieldError .input,
+.fieldError .textarea {
+  box-shadow: 0 0 0 1px #c60000;
+  background-color: #fff2f2;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+
+  border-radius: 12px;
+  background: var(--inputs);
+
+  padding: 18px;
+
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--gray);
+
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.textarea {
+  min-height: 300px;
+  resize: none;
+}
+
+.input:hover,
+.textarea:hover {
+  background: rgba(0, 0, 0, 0.045);
+}
+
+.fieldError .input:hover,
+.fieldError .textarea:hover {
+  background-color: #ffecec;
+}
+
+.input:focus,
+.textarea:focus {
+  box-shadow: 0 0 0 2px rgba(230, 68, 64, 0.25);
+}
+
+.inputError {
+  box-shadow: 0 0 0 1px #c60000;
+}
+
+.error {
+  display: none;
+}
+
+.fieldError .error {
+  display: inline-flex;
+  align-items: center;
+
+  position: absolute;
+  left: 16px;
+  top: 50px;
+  z-index: 2;
+
+  font-size: 12px;
+  line-height: 1.2;
+  color: #c60000;
+  pointer-events: none;
+
+  padding: 2px 10px;
+  border-radius: 6px;
+  border: 1px solid #c60000;
+  background-color: #ffe7e7;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: rgba(16, 24, 40, 0.45);
+}
+
+.input,
+.textarea {
+  color: #101828;
+}
+
+.input:not(:placeholder-shown),
+.textarea:not(:placeholder-shown) {
+  color: #101828;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+/* DatePicker tweaks */
+.dateWrap {
+  width: 100%;
+}
+
+:global(.react-datepicker-wrapper) {
+  width: 100%;
+}
+
+:global(.react-datepicker__input-container) {
+  width: 100%;
+}
+
+:global(.react-datepicker) {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+:global(.react-datepicker__header) {
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global(.react-datepicker__day--selected),
+:global(.react-datepicker__day--keyboard-selected) {
+  background: rgba(230, 68, 64, 0.9);
+  color: #fff;
+  border-radius: 8px;
+}
+
+:global(.react-datepicker__day:hover) {
+  border-radius: 8px;
+}
+
+@media only screen and (min-width: 1440px) {
+  .card {
+    padding: 44px 52px;
+  }
+
+  .textarea {
+    min-height: 118px;
+  }
+}
+
+.withCounter {
+  padding-right: 72px;
+}
+
+.counterIn {
+  position: absolute;
+  right: 16px;
+  top: 24px;
+
+  font-size: 12px;
+  line-height: 1.2;
+  color: rgba(16, 24, 40, 0.45);
+
+  pointer-events: none;
+  user-select: none;
+}
+
+.counterInTextarea {
+  top: auto;
+  bottom: 20px;
+}

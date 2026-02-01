@@ -1,0 +1,19 @@
+.btn {
+  background: transparent;
+  padding: 8px;
+  border-radius: 10px;
+  line-height: 0;
+
+  transition: background 200ms ease;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  background: rgba(218, 221, 225, 0.45);
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: var(--main);
+}

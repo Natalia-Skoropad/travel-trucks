@@ -1,0 +1,90 @@
+.section {
+  width: 100%;
+}
+
+.empty {
+  margin: 0;
+  padding: 24px 0;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+}
+
+.item {
+  padding: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  flex: 0 0 60px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+  background: var(--badges);
+
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--button);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--main);
+}
+
+.stars {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.star {
+  display: block;
+  fill: var(--rating);
+}
+
+.starOn {
+  opacity: 1;
+}
+
+.starOff {
+  fill: var(--badges);
+}
+
+.text {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+}

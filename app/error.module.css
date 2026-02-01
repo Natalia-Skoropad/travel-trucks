@@ -1,0 +1,107 @@
+.page {
+  position: relative;
+  min-height: calc(100vh - 72px);
+
+  background-image: url('/error-page.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  padding: 200px 0;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+      180deg,
+      rgba(16, 24, 40, 0.75) 0%,
+      rgba(16, 24, 40, 0.55) 40%,
+      rgba(16, 24, 40, 0.85) 100%
+    ),
+    linear-gradient(90deg, rgba(16, 24, 40, 0.9) 0%, rgba(16, 24, 40, 0.35) 60%);
+
+  z-index: 0;
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+
+  max-width: 600px;
+}
+
+.code {
+  display: inline-block;
+  margin-bottom: 20px;
+
+  padding: 8px 20px;
+  border-radius: 999px;
+
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.title {
+  color: var(--white);
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.text {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.4;
+  margin-bottom: 70px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+@media only screen and (min-width: 768px) {
+  .page {
+    padding: 260px 0;
+  }
+
+  .heroContent {
+    max-width: 650px;
+  }
+
+  .title {
+    font-size: 56px;
+  }
+
+  .text {
+    font-size: 22px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .heroContent {
+    max-width: 800px;
+  }
+
+  .title {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  .text {
+    margin-bottom: 40px;
+  }
+}

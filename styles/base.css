@@ -1,0 +1,39 @@
+@import 'modern-normalize/modern-normalize.css';
+
+:root {
+  --font-family: 'Inter', sans-serif;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --main: #101828;
+  --text: #475467;
+  --white: #fff;
+  --inputs: #f7f7f7;
+  --badges: #f2f4f7;
+  --gray: #6c717b;
+  --gray-light: #dadde1;
+  --button: #e44848;
+  --button-hover: #d84343;
+  --rating: #ffc531;
+}
+
+/* Base elements */
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-family), 'Roboto', 'Open Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+
+  color: var(--text);
+  background-color: var(--white);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

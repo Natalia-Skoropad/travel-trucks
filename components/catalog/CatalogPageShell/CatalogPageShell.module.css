@@ -1,0 +1,63 @@
+.toolbar {
+  margin-top: 24px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  padding-bottom: 24px;
+}
+
+.sidebar {
+  display: none;
+}
+
+.content {
+  min-width: 0;
+}
+
+.desktopActions {
+  display: none;
+  margin: 12px 0 16px;
+  justify-content: flex-end;
+
+  min-height: 56px;
+  visibility: hidden;
+}
+
+.desktopActions.visible {
+  visibility: visible;
+}
+
+.filterBtn {
+  margin-right: 10px;
+}
+
+@media only screen and (min-width: 768px) {
+  .toolbar {
+    min-width: 180px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .toolbar {
+    display: none;
+  }
+
+  .desktopActions {
+    display: flex;
+  }
+
+  .layout {
+    grid-template-columns: 405px 1fr;
+    align-items: start;
+  }
+
+  .sidebar {
+    display: block;
+    position: sticky;
+    top: 24px;
+  }
+}

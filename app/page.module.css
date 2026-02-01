@@ -1,0 +1,72 @@
+.page {
+  min-height: calc(100vh - 72px);
+
+  background: linear-gradient(
+      180deg,
+      rgba(16, 24, 40, 0.75) 0%,
+      rgba(16, 24, 40, 0.55) 40%,
+      rgba(16, 24, 40, 0.85) 100%
+    ),
+    linear-gradient(90deg, rgba(16, 24, 40, 0.9) 0%, rgba(16, 24, 40, 0.35) 60%);
+
+  background-image: url('/background-picture.jpg');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  padding: 200px 0;
+}
+
+.heroContent {
+  max-width: 600px;
+}
+
+.title {
+  color: var(--white);
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.text {
+  color: var(--white);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.4;
+  margin-bottom: 70px;
+}
+
+@media only screen and (min-width: 768px) {
+  .page {
+    padding: 260px 0;
+  }
+
+  .heroContent {
+    max-width: 650px;
+  }
+
+  .title {
+    font-size: 56px;
+  }
+
+  .text {
+    font-size: 22px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .heroContent {
+    max-width: unset;
+  }
+
+  .title {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  .text {
+    margin-bottom: 40px;
+  }
+}
