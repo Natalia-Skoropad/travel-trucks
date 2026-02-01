@@ -5,7 +5,7 @@ import css from './page.module.css';
 
 //===========================================================================
 
-const SITE_URL = 'https://travel-trucks.vercel.app';
+const SITE_URL = 'https://travel-trucks-five-liart.vercel.app/';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

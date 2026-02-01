@@ -38,12 +38,17 @@ function ReviewCard({ review }: { review: Review }) {
         <div className={css.meta}>
           <p className={css.name}>{review.reviewer_name}</p>
 
-          <div className={css.stars} aria-label={`Rating: ${stars} out of 5`}>
+          <div
+            className={css.stars}
+            role="img"
+            aria-label={`Rating: ${stars} out of 5`}
+          >
             {Array.from({ length: 5 }).map((_, i) => (
               <SvgIcon
                 key={i}
                 name="icon-star"
                 size={16}
+                aria-hidden="true"
                 className={`${css.star} ${
                   i < stars ? css.starOn : css.starOff
                 }`}

@@ -16,7 +16,7 @@ type PageProps = {
 
 //===============================================================
 
-const SITE_URL = 'https://travel-trucks.vercel.app';
+const SITE_URL = 'https://travel-trucks-five-liart.vercel.app';
 
 export async function generateMetadata({
   params,

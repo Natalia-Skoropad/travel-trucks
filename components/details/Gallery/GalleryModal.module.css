@@ -37,7 +37,6 @@
   object-fit: contain;
 }
 
-/* CONTROLS */
 .close,
 .arrow {
   border: none;
@@ -91,7 +90,6 @@
   right: 10px;
 }
 
-/* DOTS (pagination) */
 .dots {
   position: absolute;
   left: 50%;
@@ -129,7 +127,6 @@
   border-color: rgba(255, 255, 255, 0.7);
 }
 
-/* COUNTER */
 .counter {
   position: absolute;
   top: 12px;

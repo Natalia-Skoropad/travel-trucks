@@ -133,7 +133,6 @@
   padding-top: 8px;
 }
 
-/* DatePicker tweaks */
 .dateWrap {
   width: 100%;
 }
@@ -169,16 +168,6 @@
   border-radius: 8px;
 }
 
-@media only screen and (min-width: 1440px) {
-  .card {
-    padding: 44px 52px;
-  }
-
-  .textarea {
-    min-height: 118px;
-  }
-}
-
 .withCounter {
   padding-right: 72px;
 }
@@ -199,4 +188,14 @@
 .counterInTextarea {
   top: auto;
   bottom: 20px;
+}
+
+@media only screen and (min-width: 1440px) {
+  .card {
+    padding: 44px 52px;
+  }
+
+  .textarea {
+    min-height: 118px;
+  }
 }

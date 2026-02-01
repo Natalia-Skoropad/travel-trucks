@@ -1,4 +1,4 @@
-export default function Loading() {
+function Loading() {
   return (
     <main className="container">
       <div className="appLoader" role="status" aria-live="polite">
@@ -8,3 +8,5 @@ export default function Loading() {
     </main>
   );
 }
+
+export default Loading;

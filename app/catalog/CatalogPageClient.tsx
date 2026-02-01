@@ -229,6 +229,7 @@ function CatalogPageClient({
         value={tab}
         onChange={setTab}
         ariaLabel="Catalog tabs"
+        renderPanel={() => <span aria-hidden="true" />}
       />
 
       <div className={css.toolbar} style={{ justifyContent: 'flex-end' }}>

@@ -12,6 +12,7 @@ type Props = Omit<ImageProps, 'fill' | 'alt'> & {
   alt: string;
   className?: string;
   wrapClassName?: string;
+  as?: 'div' | 'span';
 };
 
 //===============================================================
@@ -21,12 +22,15 @@ function ShimmerImage({
   wrapClassName,
   onLoad,
   alt,
+  as = 'div',
   ...props
 }: Props) {
   const [loaded, setLoaded] = useState(false);
 
+  const Wrap = as;
+
   return (
-    <div className={clsx(css.wrap, wrapClassName)}>
+    <Wrap className={clsx(css.wrap, wrapClassName)}>
       <Image
         {...props}
         alt={alt}
@@ -38,11 +42,11 @@ function ShimmerImage({
         }}
       />
 
-      <div
+      <span
         className={clsx(css.skeleton, loaded && css.skeletonOff)}
         aria-hidden="true"
       />
-    </div>
+    </Wrap>
   );
 }
 

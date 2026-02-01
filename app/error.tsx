@@ -15,7 +15,7 @@ type Props = {
 
 //===============================================================
 
-export default function GlobalError({ error, reset }: Props) {
+function GlobalError({ error, reset }: Props) {
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -50,3 +50,5 @@ export default function GlobalError({ error, reset }: Props) {
     </main>
   );
 }
+
+export default GlobalError;

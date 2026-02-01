@@ -28,6 +28,7 @@ function Gallery({ images }: Props) {
               onClick={() => setActiveIndex(index)}
             >
               <ShimmerImage
+                as="span"
                 src={src}
                 alt=""
                 sizes="(max-width: 768px) 100vw, 25vw"

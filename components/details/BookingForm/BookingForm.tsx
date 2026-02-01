@@ -263,6 +263,7 @@ function BookingForm() {
                   </label>
 
                   <DatePicker
+                    id="bookingDate"
                     selected={values.bookingDate}
                     onChange={(date: Date | null) => {
                       void setFieldValue('bookingDate', date, true);
@@ -270,17 +271,18 @@ function BookingForm() {
                         bookingDate: date ? date.toISOString() : null,
                       });
                     }}
-                    onBlur={() => {
-                      void setFieldTouched('bookingDate', true, true);
-                    }}
-                    onCalendarClose={() => {
-                      void setFieldTouched('bookingDate', true, true);
-                    }}
+                    onBlur={() =>
+                      void setFieldTouched('bookingDate', true, true)
+                    }
+                    onCalendarClose={() =>
+                      void setFieldTouched('bookingDate', true, true)
+                    }
                     minDate={minDate}
                     maxDate={maxDate}
                     placeholderText="Booking date*"
                     dateFormat="dd.MM.yyyy"
                     className={css.input}
+                    name="bookingDate"
                   />
 
                   {dateHasError ? (

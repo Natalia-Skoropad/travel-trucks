@@ -19,6 +19,8 @@ type Props<T extends string> = {
 
   ariaLabel?: string;
   className?: string;
+
+  renderPanel: (value: T) => React.ReactNode;
 };
 
 //===============================================================
@@ -29,6 +31,7 @@ function Tabs<T extends string>({
   onChange,
   ariaLabel = 'Tabs',
   className,
+  renderPanel,
 }: Props<T>) {
   const baseId = useId();
 
@@ -39,6 +42,9 @@ function Tabs<T extends string>({
           const isActive = t.value === value;
           const tabId = `${baseId}-tab-${t.value}`;
           const panelId = `${baseId}-panel-${t.value}`;
+
+          const labelForA11y =
+            typeof t.count === 'number' ? `${t.label} (${t.count})` : t.label;
 
           return (
             <button
@@ -52,20 +58,39 @@ function Tabs<T extends string>({
               disabled={t.disabled}
               className={`${css.tab} ${isActive ? css.active : ''}`}
               onClick={() => onChange(t.value)}
+              aria-label={labelForA11y}
             >
-              <div className={css.divCount}>
+              <span className={css.divCount}>
                 <span className={css.label}>{t.label}</span>
 
                 {typeof t.count === 'number' ? (
-                  <span className={css.count} aria-label={`${t.count}`}>
+                  <span className={css.count} aria-hidden="true">
                     {t.count}
                   </span>
                 ) : null}
-              </div>
+              </span>
             </button>
           );
         })}
       </div>
+
+      {items.map((t) => {
+        const isActive = t.value === value;
+        const tabId = `${baseId}-tab-${t.value}`;
+        const panelId = `${baseId}-panel-${t.value}`;
+
+        return (
+          <div
+            key={t.value}
+            id={panelId}
+            role="tabpanel"
+            aria-labelledby={tabId}
+            hidden={!isActive}
+          >
+            {isActive ? renderPanel(t.value) : null}
+          </div>
+        );
+      })}
     </div>
   );
 }

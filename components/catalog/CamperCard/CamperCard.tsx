@@ -1,4 +1,3 @@
-// CamperCard.tsx
 'use client';
 
 import { useState } from 'react';
@@ -88,6 +87,7 @@ function CamperCard({ item, className }: Props) {
       <div className={css.top}>
         <div className={css.media}>
           <ShimmerImage
+            as="span"
             src={imageSrc}
             alt={item.name}
             sizes="(max-width: 767px) 100vw, (max-width: 1439px) 265px, 360px"

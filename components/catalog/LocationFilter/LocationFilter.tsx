@@ -117,7 +117,12 @@ function LocationFilter({
         </button>
 
         {open && hasList && (
-          <div className={css.dropdown} role="listbox" id={`${name}-listbox`}>
+          <div
+            className={css.dropdown}
+            role="listbox"
+            id={`${name}-listbox`}
+            hidden={!open || !hasList}
+          >
             {filtered.map((s) => {
               const active = s === value;
               return (

@@ -23,7 +23,6 @@ type Props = {
 
 function CamperDetailsBottom({ camper, className }: Props) {
   const [tab, setTab] = useState<DetailsTab>('features');
-
   const reviewsCount = camper.reviews?.length ?? 0;
 
   const items = useMemo(
@@ -37,25 +36,24 @@ function CamperDetailsBottom({ camper, className }: Props) {
   return (
     <div className={`${css.section} ${className ?? ''}`}>
       <div className={css.inner}>
-        {/* LEFT: tabs + content */}
         <div className={css.left}>
           <Tabs<DetailsTab>
             ariaLabel="Camper details"
             items={items}
             value={tab}
             onChange={setTab}
-          />
-
-          <div className={css.panel}>
-            {tab === 'features' ? (
-              <CamperSpecs camper={camper} />
-            ) : (
-              <ReviewsList reviews={camper.reviews} />
+            renderPanel={(v) => (
+              <div className={css.panel}>
+                {v === 'features' ? (
+                  <CamperSpecs camper={camper} />
+                ) : (
+                  <ReviewsList reviews={camper.reviews} />
+                )}
+              </div>
             )}
-          </div>
+          />
         </div>
 
-        {/* RIGHT (desktop) / BOTTOM (mobile+tablet): form */}
         <aside className={css.right}>
           <BookingForm />
         </aside>
