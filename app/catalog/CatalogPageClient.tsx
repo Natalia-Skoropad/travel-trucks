@@ -12,6 +12,8 @@ import { useCatalogStore } from '@/lib/store/catalogStore';
 import { filtersToSearchParams } from '@/lib/utils/catalogUrl';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
+import { LOCATIONS } from '@/lib/constants/locations';
+
 import CatalogFilters from '@/components/catalog/CatalogFilters/CatalogFilters';
 import CatalogPageShell from '@/components/catalog/CatalogPageShell/CatalogPageShell';
 import CampersList from '@/components/catalog/CampersList/CampersList';
@@ -44,6 +46,12 @@ function isFiltersApplied(v: CatalogFiltersValue) {
 
 //===========================================================================
 
+function uniqSorted(list: string[]) {
+  return Array.from(new Set(list)).sort((a, b) => a.localeCompare(b));
+}
+
+//===========================================================================
+
 function CatalogPageClient({
   initialItems,
   initialTotal,
@@ -62,21 +70,19 @@ function CatalogPageClient({
 
   const filters = useCatalogStore((s) => s.filters);
   const debouncedLocation = useDebouncedValue(filters.location, 450);
+  const effectiveLocation = filters.location.trim() ? debouncedLocation : '';
 
   const effectiveFilters: CatalogFiltersValue = useMemo(
-    () => ({ ...filters, location: debouncedLocation }),
-    [filters, debouncedLocation]
+    () => ({ ...filters, location: effectiveLocation }),
+    [filters, effectiveLocation]
   );
 
   //===========================================================================
 
-  const skipNextSearchRef = useRef(false);
   const didInitRef = useRef(false);
   const init = useCatalogStore((s) => s.init);
 
   useEffect(() => {
-    skipNextSearchRef.current = true;
-
     init({
       items: initialItems,
       total: initialTotal,
@@ -125,13 +131,11 @@ function CatalogPageClient({
 
   //===========================================================================
 
-  const lastHrefRef = useRef<string>('');
   const resetFilters = useCatalogStore((s) => s.resetFilters);
 
   const reset = () => {
     startTransition(async () => {
       resetFilters();
-      lastHrefRef.current = '/catalog';
       router.replace('/catalog');
       await search();
     });
@@ -149,10 +153,12 @@ function CatalogPageClient({
 
     async function loadFavorites() {
       if (tab !== 'favorites') return;
+
       if (!favorites.length) {
         setFavoriteItems([]);
         return;
       }
+
       setIsFavLoading(true);
 
       try {
@@ -180,6 +186,7 @@ function CatalogPageClient({
   }, [tab, favorites]);
 
   const visibleItems = tab === 'favorites' ? favoriteItems : items;
+
   const favoritesCount =
     tab === 'favorites'
       ? isFavLoading
@@ -194,15 +201,17 @@ function CatalogPageClient({
 
   //===========================================================================
 
+  const locationSuggestions = useMemo(() => {
+    const fromCards = uniqSorted(
+      items.map((c) => (c.location ?? '').trim()).filter((x) => x.length > 0)
+    );
+
+    const allowed = new Set<string>(LOCATIONS as readonly string[]);
+    return fromCards.filter((x) => allowed.has(x));
+  }, [items]);
+
   const filtersApplied = isFiltersApplied(filters);
   const isLoading = useCatalogStore((s) => s.isLoading);
-
-  const locations = useCatalogStore((s) => s.locations);
-  const loadLocations = useCatalogStore((s) => s.loadLocations);
-
-  useEffect(() => {
-    void loadLocations();
-  }, [loadLocations]);
 
   const filtersUI = (
     <CatalogFilters
@@ -211,7 +220,7 @@ function CatalogPageClient({
       onReset={reset}
       isResetDisabled={!filtersApplied || isPending || isLoading}
       isFiltering={isPending || isLoading}
-      locationSuggestions={locations}
+      locationSuggestions={locationSuggestions}
     />
   );
 

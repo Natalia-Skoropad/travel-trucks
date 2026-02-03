@@ -2,6 +2,7 @@
 import { X } from 'lucide-react';
 
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
+import { LOCATIONS } from '@/lib/constants/locations';
 
 import LocationFilter from '@/components/catalog/LocationFilter/LocationFilter';
 import VehicleEquipmentFilter from '@/components/catalog/VehicleEquipmentFilter/VehicleEquipmentFilter';
@@ -32,7 +33,6 @@ function CatalogFilters({
   value,
   onChange,
   onReset,
-  locationSuggestions,
   className,
   isResetDisabled = false,
   isFiltering = false,
@@ -55,7 +55,7 @@ function CatalogFilters({
       <div className={css.block}>
         <LocationFilter
           value={value.location}
-          suggestions={locationSuggestions}
+          suggestions={[...LOCATIONS]}
           onChange={(location) => onChange({ ...value, location })}
         />
       </div>

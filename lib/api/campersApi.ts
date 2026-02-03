@@ -53,29 +53,3 @@ export async function fetchCamperById(id: string): Promise<Camper> {
   const { data } = await nextServer.get<Camper>(`/catalog/${id}`);
   return data;
 }
-
-//===========================================================================
-
-export async function fetchAllLocations(): Promise<string[]> {
-  const limit = 100;
-  let page = 1;
-
-  const uniq = new Set<string>();
-
-  while (true) {
-    const data = await fetchCampers({ page, limit });
-
-    data.items.forEach((c) => {
-      const loc = (c.location ?? '').trim();
-      if (loc) uniq.add(loc);
-    });
-
-    const loaded = page * limit;
-    const isLastPage = loaded >= data.total || data.items.length === 0;
-    if (isLastPage) break;
-
-    page += 1;
-  }
-
-  return Array.from(uniq).sort((a, b) => a.localeCompare(b));
-}

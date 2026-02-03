@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 import type { Camper } from '@/types/camper';
 import type { CampersQuery } from '@/lib/api/campersApi';
-import { fetchCampers, fetchAllLocations } from '@/lib/api/campersApi';
+import { fetchCampers } from '@/lib/api/campersApi';
 
 import { CATALOG_LIMIT } from '@/lib/constants/pagination';
 import { DEFAULT_CATALOG_FILTERS } from '@/lib/constants/catalogDefaults';
@@ -20,12 +20,6 @@ type CatalogState = {
   total: number;
   page: number;
   limit: number;
-
-  locations: string[];
-  isLocationsLoading: boolean;
-  locationsError: string | null;
-
-  loadLocations: () => Promise<void>;
 
   isLoading: boolean;
   error: string | null;
@@ -66,7 +60,7 @@ function buildQuery(
 
   (Object.keys(filters.equipment) as EquipmentKey[]).forEach((k) => {
     if (filters.equipment[k]) {
-      (query as Record<EquipmentKey, boolean | undefined>)[k] = true;
+      query[k] = true;
     }
   });
 
@@ -83,33 +77,11 @@ export const useCatalogStore = create<CatalogState>()(
       page: 1,
       limit: CATALOG_LIMIT,
 
-      locations: [],
-      isLocationsLoading: false,
-      locationsError: null,
-
       isLoading: false,
       error: null,
 
       filters: DEFAULT_CATALOG_FILTERS,
       favorites: [],
-
-      loadLocations: async () => {
-        const { locations, isLocationsLoading } = get();
-        if (isLocationsLoading) return;
-        if (locations.length) return;
-
-        set({ isLocationsLoading: true, locationsError: null });
-
-        try {
-          const all = await fetchAllLocations();
-          set({ locations: all, isLocationsLoading: false });
-        } catch (e) {
-          set({
-            locationsError: e instanceof Error ? e.message : 'Unknown error',
-            isLocationsLoading: false,
-          });
-        }
-      },
 
       setFilters: (next) => set({ filters: next }),
       resetFilters: () => set({ filters: DEFAULT_CATALOG_FILTERS }),

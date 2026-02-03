@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
+import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 import css from './LocationFilter.module.css';
 
 //===========================================================================
@@ -82,9 +83,7 @@ function LocationFilter({
       </label>
 
       <div className={css.control}>
-        <svg className={css.icon} aria-hidden="true">
-          <use href="/icons.svg#icon-map" />
-        </svg>
+        <SvgIcon name="icon-map" className={css.icon} title="Location" />
 
         <input
           id={name}
