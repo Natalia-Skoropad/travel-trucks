@@ -31,7 +31,7 @@ export async function fetchCampers(
   params?: CampersQuery
 ): Promise<CampersResponse> {
   try {
-    const { data } = await nextServer.get<CampersResponse>('/campers', {
+    const { data } = await nextServer.get<CampersResponse>('/catalog', {
       params,
     });
 
@@ -50,7 +50,7 @@ export async function fetchCampers(
 //===========================================================================
 
 export async function fetchCamperById(id: string): Promise<Camper> {
-  const { data } = await nextServer.get<Camper>(`/campers/${id}`);
+  const { data } = await nextServer.get<Camper>(`/catalog/${id}`);
   return data;
 }
 

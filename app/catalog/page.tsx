@@ -1,6 +1,13 @@
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
+
 import type { Metadata } from 'next';
 import { fetchCampers } from '@/lib/api/campersApi';
 import { CATALOG_LIMIT } from '@/lib/constants/pagination';
+import type { CampersResponse } from '@/types/camper';
 
 import {
   filtersFromSearchParams,
@@ -39,7 +46,7 @@ async function CatalogPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const filters = filtersFromSearchParams(sp);
 
-  const data = await fetchCampers({
+  const params = {
     page: 1,
     limit: CATALOG_LIMIT,
 
@@ -54,22 +61,39 @@ async function CatalogPage({ searchParams }: PageProps) {
         .filter(([, v]) => v)
         .map(([k]) => [k, true])
     ),
+  };
+
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ['campers', params],
+    queryFn: () => fetchCampers(params),
   });
 
-  return (
-    <main>
-      <div className="container">
-        <Breadcrumbs
-          items={[{ label: 'Home', href: '/' }, { label: 'Catalog' }]}
-        />
+  const data = queryClient.getQueryData<CampersResponse>([
+    'campers',
+    params,
+  ]) ?? {
+    items: [],
+    total: 0,
+  };
 
-        <CatalogPageClient
-          initialItems={data.items}
-          initialTotal={data.total}
-          initialFilters={filters}
-        />
-      </div>
-    </main>
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <main>
+        <div className="container">
+          <Breadcrumbs
+            items={[{ label: 'Home', href: '/' }, { label: 'Catalog' }]}
+          />
+
+          <CatalogPageClient
+            initialItems={data.items}
+            initialTotal={data.total}
+            initialFilters={filters}
+          />
+        </div>
+      </main>
+    </HydrationBoundary>
   );
 }
 

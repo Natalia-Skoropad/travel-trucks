@@ -1,3 +1,9 @@
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
+
 import type { Metadata } from 'next';
 import { fetchCamperById } from '@/lib/api/campersApi';
 
@@ -66,25 +72,38 @@ export async function generateMetadata({
 
 async function CamperDetailsPage({ params }: PageProps) {
   const { id } = await params;
-  const camper = await fetchCamperById(id);
+
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ['camper', id],
+    queryFn: () => fetchCamperById(id),
+  });
+
+  const camper = await queryClient.fetchQuery({
+    queryKey: ['camper', id],
+    queryFn: () => fetchCamperById(id),
+  });
 
   return (
-    <main className="container">
-      <Breadcrumbs
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Catalog', href: '/catalog' },
-          { label: camper.name },
-        ]}
-      />
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <main className="container">
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Catalog', href: '/catalog' },
+            { label: camper.name },
+          ]}
+        />
 
-      <CamperPrevNextNav currentId={id} />
+        <CamperPrevNextNav currentId={id} />
 
-      <CamperPageClient camperId={id} title={camper.name} />
+        <CamperPageClient camperId={id} title={camper.name} />
 
-      <CamperHero camper={camper} />
-      <CamperDetailsBottom camper={camper} />
-    </main>
+        <CamperHero camper={camper} />
+        <CamperDetailsBottom camper={camper} />
+      </main>
+    </HydrationBoundary>
   );
 }
 
