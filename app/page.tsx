@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 
 import ButtonLink from '@/components/common/Button/ButtonLink';
 import css from './page.module.css';
@@ -44,6 +45,15 @@ export const metadata: Metadata = {
 function Home() {
   return (
     <main className={css.page}>
+      <Image
+        src="/background-picture.jpg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className={css.bgImage}
+      />
+
       <div className="container">
         <div className={css.heroContent}>
           <h1 className={css.title}>Campers of your dreams</h1>

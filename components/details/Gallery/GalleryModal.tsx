@@ -88,7 +88,7 @@ function GalleryModal({ images, startIndex, onClose }: Props) {
           <Image
             key={images[index]}
             src={images[index]}
-            alt=""
+            alt={`Gallery image ${index + 1} of ${total}`}
             fill
             className={css.image}
             sizes="(max-width: 900px) 90vw, 900px"

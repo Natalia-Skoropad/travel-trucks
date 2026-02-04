@@ -1,21 +1,32 @@
 .page {
+  position: relative;
   min-height: calc(100vh - 72px);
+  padding: 200px 0;
+  overflow: hidden;
 
   background: linear-gradient(
       180deg,
-      rgba(16, 24, 40, 0.75) 0%,
-      rgba(16, 24, 40, 0.55) 40%,
-      rgba(16, 24, 40, 0.85) 100%
+      rgba(16, 24, 40, 0.9) 0%,
+      rgba(16, 24, 40, 0.75) 45%,
+      rgba(16, 24, 40, 0.95) 100%
     ),
-    linear-gradient(90deg, rgba(16, 24, 40, 0.9) 0%, rgba(16, 24, 40, 0.35) 60%);
+    linear-gradient(
+      180deg,
+      rgba(16, 24, 40, 0.88) 0%,
+      rgba(16, 24, 40, 0.7) 60%,
+      rgba(16, 24, 40, 0.92) 100%
+    );
+}
 
-  background-image: url('/background-picture.jpg');
+.bgImage {
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  padding: 200px 0;
+.page :global(.container) {
+  position: relative;
+  z-index: 1;
 }
 
 .heroContent {

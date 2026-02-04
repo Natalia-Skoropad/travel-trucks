@@ -21,11 +21,12 @@ function Gallery({ images }: Props) {
     <>
       <ul className={css.list}>
         {images.slice(0, 4).map((src, index) => (
-          <li key={src} className={css.item}>
+          <li key={`${src}-${index}`} className={css.item}>
             <button
               type="button"
               className={css.imageBtn}
               onClick={() => setActiveIndex(index)}
+              aria-label={`Open gallery image ${index + 1}`}
             >
               <ShimmerImage
                 as="span"

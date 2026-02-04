@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 
 import ButtonLink from '@/components/common/Button/ButtonLink';
 import css from './not-found.module.css';
@@ -16,6 +17,14 @@ export const metadata: Metadata = {
 function NotFound() {
   return (
     <main className={css.page}>
+      <Image
+        src="/404-page.jpg"
+        alt=""
+        fill
+        sizes="100vw"
+        className={css.bgImage}
+      />
+
       <div className="container">
         <div className={css.heroContent}>
           <span className={css.code}>404</span>

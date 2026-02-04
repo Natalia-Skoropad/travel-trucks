@@ -70,6 +70,8 @@ function LocationFilter({
   }, [open]);
 
   const hasList = filtered.length > 0;
+  const listboxId = `${name}-listbox`;
+  const showList = open && hasList;
 
   const pick = (city: string) => {
     onChange(city);
@@ -99,29 +101,25 @@ function LocationFilter({
           placeholder={placeholder}
           autoComplete="off"
           role="combobox"
-          aria-expanded={open}
-          aria-controls={`${name}-listbox`}
+          aria-expanded={showList}
+          aria-controls={showList ? listboxId : undefined}
           aria-autocomplete="list"
+          aria-haspopup="listbox"
         />
 
         <button
           type="button"
           className={css.chevronBtn}
           onClick={() => setOpen((v) => !v)}
-          aria-label={open ? 'Close list' : 'Open list'}
+          aria-label={showList ? 'Close list' : 'Open list'}
         >
           <ChevronDown
             className={`${css.chevron} ${open ? css.chevronOpen : ''}`}
           />
         </button>
 
-        {open && hasList && (
-          <div
-            className={css.dropdown}
-            role="listbox"
-            id={`${name}-listbox`}
-            hidden={!open || !hasList}
-          >
+        {showList && (
+          <div className={css.dropdown} role="listbox" id={listboxId}>
             {filtered.map((s) => {
               const active = s === value;
               return (

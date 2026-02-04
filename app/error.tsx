@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
+import Image from 'next/image';
+
 import Button from '@/components/common/Button/Button';
 import ButtonLink from '@/components/common/Button/ButtonLink';
 
@@ -22,7 +24,13 @@ function GlobalError({ error, reset }: Props) {
 
   return (
     <main className={css.page}>
-      <div className={css.overlay} />
+      <Image
+        src="/error-page.jpg"
+        alt=""
+        fill
+        sizes="100vw"
+        className={css.bgImage}
+      />
 
       <div className="container">
         <div className={css.heroContent}>

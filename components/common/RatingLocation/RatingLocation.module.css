@@ -21,6 +21,7 @@
 .map {
   width: 16px;
   height: 16px;
+  fill: var(--button-hover);
 }
 
 .ratingText {
@@ -41,7 +42,7 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 1.5;
-  color: var(--text);
+  color: var(--button-hover);
 
   position: relative;
   white-space: nowrap;
