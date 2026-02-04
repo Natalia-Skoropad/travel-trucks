@@ -40,6 +40,9 @@ type CatalogState = {
   loadMore: () => Promise<void>;
 
   toggleFavorite: (id: string) => void;
+
+  hasHydrated: boolean;
+  setHasHydrated: (v: boolean) => void;
 };
 
 //===========================================================================
@@ -59,9 +62,7 @@ function buildQuery(
   if (filters.transmission) query.transmission = filters.transmission;
 
   (Object.keys(filters.equipment) as EquipmentKey[]).forEach((k) => {
-    if (filters.equipment[k]) {
-      query[k] = true;
-    }
+    if (filters.equipment[k]) query[k] = true;
   });
 
   return query;
@@ -83,6 +84,9 @@ export const useCatalogStore = create<CatalogState>()(
       filters: DEFAULT_CATALOG_FILTERS,
       favorites: [],
 
+      hasHydrated: false,
+      setHasHydrated: (v) => set({ hasHydrated: v }),
+
       setFilters: (next) => set({ filters: next }),
       resetFilters: () => set({ filters: DEFAULT_CATALOG_FILTERS }),
 
@@ -100,7 +104,7 @@ export const useCatalogStore = create<CatalogState>()(
         const { filters: stateFilters, limit } = get();
         const activeFilters = overrideFilters ?? stateFilters;
 
-        set({ isLoading: true, error: null, items: [], total: 0, page: 1 });
+        set({ isLoading: true, error: null, page: 1 });
 
         try {
           const data = await fetchCampers(buildQuery(activeFilters, 1, limit));
@@ -155,6 +159,11 @@ export const useCatalogStore = create<CatalogState>()(
     {
       name: 'traveltrucks_catalog',
       partialize: (s) => ({ filters: s.filters, favorites: s.favorites }),
+      onRehydrateStorage: () => {
+        return (state) => {
+          state?.setHasHydrated(true);
+        };
+      },
     }
   )
 );

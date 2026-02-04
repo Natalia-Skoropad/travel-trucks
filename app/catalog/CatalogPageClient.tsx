@@ -68,18 +68,8 @@ function CatalogPageClient({
 
   //===========================================================================
 
-  const filters = useCatalogStore((s) => s.filters);
-  const debouncedLocation = useDebouncedValue(filters.location, 450);
-  const effectiveLocation = filters.location.trim() ? debouncedLocation : '';
-
-  const effectiveFilters: CatalogFiltersValue = useMemo(
-    () => ({ ...filters, location: effectiveLocation }),
-    [filters, effectiveLocation]
-  );
-
-  //===========================================================================
-
   const didInitRef = useRef(false);
+  const lastHrefRef = useRef<string>('');
   const init = useCatalogStore((s) => s.init);
 
   useEffect(() => {
@@ -94,22 +84,42 @@ function CatalogPageClient({
 
   //===========================================================================
 
+  const filters = useCatalogStore((s) => s.filters);
+  const debouncedLocation = useDebouncedValue(filters.location, 450);
+  const effectiveLocation = filters.location.trim() ? debouncedLocation : '';
+
+  const effectiveFilters: CatalogFiltersValue = useMemo(
+    () => ({
+      ...filters,
+      location: effectiveLocation,
+      equipment: { ...filters.equipment },
+    }),
+    [filters, effectiveLocation]
+  );
+
+  //===========================================================================
+
+  const hasHydrated = useCatalogStore((s) => s.hasHydrated);
   const search = useCatalogStore((s) => s.search);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (!didInitRef.current) return;
+    if (!hasHydrated) return;
 
-    const params = filtersToSearchParams(effectiveFilters);
-    const qs = params.toString();
+    const qs = filtersToSearchParams(effectiveFilters).toString();
     const href = qs ? `/catalog?${qs}` : '/catalog';
 
+    if (href === lastHrefRef.current) return;
+    lastHrefRef.current = href;
+
     startTransition(async () => {
-      router.replace(href);
+      router.replace(href, { scroll: false });
       await search();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    hasHydrated,
     effectiveFilters.location,
     effectiveFilters.form,
     effectiveFilters.engine,
@@ -136,7 +146,8 @@ function CatalogPageClient({
   const reset = () => {
     startTransition(async () => {
       resetFilters();
-      router.replace('/catalog');
+      lastHrefRef.current = ''; // allow url to update after reset
+      router.replace('/catalog', { scroll: false });
       await search();
     });
   };
