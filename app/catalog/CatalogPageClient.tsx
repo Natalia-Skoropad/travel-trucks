@@ -16,6 +16,7 @@ import CatalogFilters from '@/components/catalog/CatalogFilters/CatalogFilters';
 import CatalogPageShell from '@/components/catalog/CatalogPageShell/CatalogPageShell';
 import CampersList from '@/components/catalog/CampersList/CampersList';
 import Button from '@/components/common/Button/Button';
+import Pagination from '@/components/common/Pagination/Pagination';
 import Tabs from '@/components/common/Tabs/Tabs';
 
 import css from '@/components/catalog/CatalogPageShell/CatalogPageShell.module.css';
@@ -24,6 +25,7 @@ import css from '@/components/catalog/CatalogPageShell/CatalogPageShell.module.c
 
 type Props = {
   initialFilters: CatalogFiltersValue;
+  initialPage: number;
 };
 
 type TabValue = 'all' | 'favorites';
@@ -36,27 +38,22 @@ function uniqSorted(list: string[]) {
 
 //===========================================================================
 
-function CatalogPageClient({ initialFilters }: Props) {
+function CatalogPageClient({ initialFilters, initialPage }: Props) {
   const openFiltersRef = useRef<(() => void) | null>(null);
 
   const {
     filters,
     effectiveFilters,
+    page,
+    setPage,
     setFilters,
     resetFilters,
     filtersApplied,
     isPending,
-  } = useCatalogFilters(initialFilters);
+  } = useCatalogFilters(initialFilters, initialPage);
 
-  const {
-    campers,
-    total,
-    isLoading,
-    isFetching,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useCatalogCampers(effectiveFilters);
+  const { campers, total, totalPages, isLoading, isFetching } =
+    useCatalogCampers(effectiveFilters, page);
 
   const { favoriteIds, favoritesCount } = useFavorites();
 
@@ -195,16 +192,13 @@ function CatalogPageClient({ initialFilters }: Props) {
         />
       </div>
 
-      {tab === 'all' && hasNextPage ? (
-        <div className={css.loadMoreWrap}>
-          <Button
-            onClick={() => void fetchNextPage()}
-            disabled={isCatalogBusy || isFetchingNextPage}
-            variant="outlineRed"
-          >
-            {isFetchingNextPage ? 'Loading…' : 'Load more'}
-          </Button>
-        </div>
+      {tab === 'all' ? (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          disabled={isCatalogBusy}
+          onPageChange={setPage}
+        />
       ) : null}
     </CatalogPageShell>
   );

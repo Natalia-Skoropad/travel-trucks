@@ -91,6 +91,7 @@ export function filtersFromSearchParams(
     engine,
     transmission,
     equipment,
+    sort: '',
   };
 }
 

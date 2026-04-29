@@ -20,13 +20,17 @@ function cloneFilters(filters: CatalogFiltersValue): CatalogFiltersValue {
 
 //===========================================================================
 
-export function useCatalogFilters(initialFilters: CatalogFiltersValue) {
+export function useCatalogFilters(
+  initialFilters: CatalogFiltersValue,
+  initialPage = 1
+) {
   const router = useRouter();
 
   const [filters, setFiltersState] = useState<CatalogFiltersValue>(() =>
     cloneFilters(initialFilters ?? DEFAULT_CATALOG_FILTERS)
   );
 
+  const [page, setPageState] = useState(initialPage);
   const [isPending, startTransition] = useTransition();
 
   const debouncedLocation = useDebouncedValue(filters.location, 450);
@@ -41,10 +45,10 @@ export function useCatalogFilters(initialFilters: CatalogFiltersValue) {
     [filters, effectiveLocation]
   );
 
-  const lastHrefRef = useRef(buildCatalogPath(effectiveFilters));
+  const lastHrefRef = useRef(buildCatalogPath(effectiveFilters, page));
 
   useEffect(() => {
-    const href = buildCatalogPath(effectiveFilters);
+    const href = buildCatalogPath(effectiveFilters, page);
 
     if (href === lastHrefRef.current) return;
 
@@ -55,6 +59,7 @@ export function useCatalogFilters(initialFilters: CatalogFiltersValue) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    page,
     effectiveFilters.location,
     effectiveFilters.form,
     effectiveFilters.engine,
@@ -64,13 +69,19 @@ export function useCatalogFilters(initialFilters: CatalogFiltersValue) {
   ]);
 
   const setFilters = (next: CatalogFiltersValue) => {
+    setPageState(1);
     setFiltersState(cloneFilters(next));
+  };
+
+  const setPage = (nextPage: number) => {
+    setPageState(nextPage);
   };
 
   const resetFilters = () => {
     const next = cloneFilters(DEFAULT_CATALOG_FILTERS);
 
     setFiltersState(next);
+    setPageState(1);
     lastHrefRef.current = '/catalog';
 
     startTransition(() => {
@@ -81,6 +92,8 @@ export function useCatalogFilters(initialFilters: CatalogFiltersValue) {
   return {
     filters,
     effectiveFilters,
+    page,
+    setPage,
     setFilters,
     resetFilters,
     filtersApplied: isCatalogFiltersApplied(filters),

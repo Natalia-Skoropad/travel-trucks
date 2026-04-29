@@ -27,11 +27,11 @@ export const campersQueryKeys = {
 
   lists: () => [...campersQueryKeys.all, 'list'] as const,
 
-  list: (filters: CatalogFiltersValue, perPage: number) =>
+  list: (filters: CatalogFiltersValue, page: number, perPage: number) =>
     [
       ...campersQueryKeys.lists(),
       normalizeFilters(filters),
-      { perPage },
+      { page, perPage },
     ] as const,
 
   detail: (id: string) => [...campersQueryKeys.all, 'detail', id] as const,

@@ -1,7 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
-import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { fetchCampers } from '@/lib/api/campersApi';
 import { CATALOG_PER_PAGE } from '@/lib/constants/pagination';
@@ -11,16 +10,11 @@ import { buildCatalogApiParams } from '@/lib/utils/catalogSegments';
 
 //===========================================================================
 
-export function useCatalogCampers(filters: CatalogFiltersValue) {
-  const query = useInfiniteQuery({
-    queryKey: campersQueryKeys.list(filters, CATALOG_PER_PAGE),
-    queryFn: ({ pageParam }) =>
-      fetchCampers(
-        buildCatalogApiParams(filters, Number(pageParam), CATALOG_PER_PAGE)
-      ),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+export function useCatalogCampers(filters: CatalogFiltersValue, page: number) {
+  const query = useQuery({
+    queryKey: campersQueryKeys.list(filters, page, CATALOG_PER_PAGE),
+    queryFn: () =>
+      fetchCampers(buildCatalogApiParams(filters, page, CATALOG_PER_PAGE)),
     staleTime: 1000 * 60,
     gcTime: 1000 * 60 * 10,
     placeholderData: keepPreviousData,
@@ -28,18 +22,11 @@ export function useCatalogCampers(filters: CatalogFiltersValue) {
     refetchOnWindowFocus: false,
   });
 
-  const campers = useMemo(
-    () => query.data?.pages.flatMap((page) => page.campers) ?? [],
-    [query.data]
-  );
-
-  const total = query.data?.pages[0]?.total ?? 0;
-  const totalPages = query.data?.pages[0]?.totalPages ?? 0;
-
   return {
     ...query,
-    campers,
-    total,
-    totalPages,
+    campers: query.data?.campers ?? [],
+    total: query.data?.total ?? 0,
+    totalPages: query.data?.totalPages ?? 0,
+    currentPage: query.data?.page ?? page,
   };
 }

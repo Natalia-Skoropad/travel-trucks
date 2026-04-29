@@ -20,7 +20,17 @@ function CatalogSeoText({ filters }: Props) {
         {seo.title}
       </h2>
 
-      <p className={css.text}>{seo.text}</p>
+      <p className={css.text}>
+        {seo.descriptionParts.map((part, index) =>
+          part.highlighted ? (
+            <strong key={index} className={css.highlight}>
+              {part.text}
+            </strong>
+          ) : (
+            <span key={index}>{part.text}</span>
+          )
+        )}
+      </p>
     </section>
   );
 }

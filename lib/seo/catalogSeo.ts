@@ -116,45 +116,90 @@ export function buildCatalogDescription(
 export function buildCatalogSeoText(filters: CatalogFiltersValue) {
   const location = filters.location.trim();
 
-  const introParts: string[] = [];
+  const highlights: string[] = [];
 
   if (location) {
-    introParts.push(`available in ${location}`);
+    highlights.push(location);
   }
 
   if (filters.form) {
-    introParts.push(`${formatCamperFormLabel(filters.form)} campers`);
+    highlights.push(formatCamperFormLabel(filters.form));
   }
 
   if (filters.transmission) {
-    introParts.push(
-      `${formatTransmissionLabel(
-        filters.transmission
-      ).toLowerCase()} transmission`
-    );
+    highlights.push(formatTransmissionLabel(filters.transmission));
   }
 
   if (filters.engine) {
-    introParts.push(
-      `${formatEngineLabel(filters.engine).toLowerCase()} engine`
-    );
+    highlights.push(formatEngineLabel(filters.engine));
   }
 
   const amenities = getActiveAmenities(filters).map(formatAmenityLabel);
 
-  if (amenities.length) {
-    introParts.push(`features like ${amenities.join(', ')}`);
+  highlights.push(...amenities);
+
+  const title = highlights.length
+    ? `Choose your ${highlights.join(' • ')} camper for the next road trip`
+    : 'Choose your camper for the next road trip';
+
+  const descriptionParts = [
+    {
+      text: 'Explore TravelTrucks campers',
+      highlighted: false,
+    },
+  ];
+
+  if (location) {
+    descriptionParts.push({ text: ' in ', highlighted: false });
+    descriptionParts.push({ text: location, highlighted: true });
   }
 
-  const filteredPhrase = introParts.length
-    ? ` matching ${introParts.join(', ')}`
-    : '';
+  if (filters.form) {
+    descriptionParts.push({ text: ' with ', highlighted: false });
+    descriptionParts.push({
+      text: formatCamperFormLabel(filters.form),
+      highlighted: true,
+    });
+    descriptionParts.push({ text: ' body type', highlighted: false });
+  }
+
+  if (filters.transmission) {
+    descriptionParts.push({ text: ', ', highlighted: false });
+    descriptionParts.push({
+      text: formatTransmissionLabel(filters.transmission),
+      highlighted: true,
+    });
+    descriptionParts.push({ text: ' transmission', highlighted: false });
+  }
+
+  if (filters.engine) {
+    descriptionParts.push({ text: ', ', highlighted: false });
+    descriptionParts.push({
+      text: formatEngineLabel(filters.engine),
+      highlighted: true,
+    });
+    descriptionParts.push({ text: ' engine', highlighted: false });
+  }
+
+  if (amenities.length) {
+    descriptionParts.push({
+      text: ', and equipment such as ',
+      highlighted: false,
+    });
+    descriptionParts.push({
+      text: amenities.join(', '),
+      highlighted: true,
+    });
+  }
+
+  descriptionParts.push({
+    text: '. Compare prices, ratings, locations, vehicle specifications, gallery photos, reviews, and booking options to choose the right camper for your trip.',
+    highlighted: false,
+  });
 
   return {
-    title: introParts.length
-      ? 'Find a camper that matches your trip'
-      : 'Choose your camper for the next road trip',
-    text: `Explore TravelTrucks campers${filteredPhrase}. Use the catalog to compare vehicle forms, equipment, engine types, transmission, prices, ratings, and locations. Each camper card gives you a quick overview, while the details page includes gallery photos, reviews, vehicle specifications, and a booking form.`,
+    title,
+    descriptionParts,
   };
 }
 

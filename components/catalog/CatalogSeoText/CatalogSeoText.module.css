@@ -21,6 +21,11 @@
   color: var(--color-text-muted, #475467);
 }
 
+.highlight {
+  font-weight: 700;
+  color: var(--color-main, #101828);
+}
+
 @media only screen and (min-width: 768px) {
   .section {
     margin-top: 56px;

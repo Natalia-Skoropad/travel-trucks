@@ -14,7 +14,7 @@ import {
 } from '@/lib/api/campersApi';
 import { CATALOG_PER_PAGE } from '@/lib/constants/pagination';
 import { campersQueryKeys } from '@/lib/queryKeys/campersQueryKeys';
-import type { CampersResponse } from '@/types/catalog';
+
 import {
   buildCatalogApiParams,
   buildCatalogBreadcrumbs,
@@ -89,19 +89,15 @@ async function CatalogListPage({ segments }: { segments?: string[] }) {
 
   const queryClient = new QueryClient();
 
-  const initialData = await queryClient.fetchInfiniteQuery({
-    queryKey: campersQueryKeys.list(filters, CATALOG_PER_PAGE),
-    queryFn: ({ pageParam }) =>
+  const initialData = await queryClient.fetchQuery({
+    queryKey: campersQueryKeys.list(filters, page, CATALOG_PER_PAGE),
+    queryFn: () =>
       fetchCampersFromServer(
-        buildCatalogApiParams(filters, Number(pageParam), CATALOG_PER_PAGE)
+        buildCatalogApiParams(filters, page, CATALOG_PER_PAGE)
       ),
-    initialPageParam: page,
-    getNextPageParam: (lastPage: CampersResponse) =>
-      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
   });
 
-  const firstPage = initialData.pages[0];
-  const hasCampers = Boolean(firstPage?.campers.length);
+  const hasCampers = Boolean(initialData.campers.length);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -109,7 +105,7 @@ async function CatalogListPage({ segments }: { segments?: string[] }) {
         <div className="container">
           <Breadcrumbs items={buildCatalogBreadcrumbs(filters, page)} />
 
-          <CatalogPageClient initialFilters={filters} />
+          <CatalogPageClient initialFilters={filters} initialPage={page} />
 
           {page === 1 && hasCampers ? (
             <CatalogSeoText filters={filters} />
