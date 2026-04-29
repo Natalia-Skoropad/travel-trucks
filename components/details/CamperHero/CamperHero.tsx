@@ -23,7 +23,7 @@ type Props = {
 //===========================================================================
 
 function CamperHero({ camper }: Props) {
-  const images = camper.gallery?.map((item) => item.original) ?? [];
+  const images = camper.gallery?.map((image) => image.original) ?? [];
 
   return (
     <section className={css.section}>
@@ -41,7 +41,9 @@ function CamperHero({ camper }: Props) {
 
       <Gallery images={images} />
 
-      <p className={css.desc}>{camper.description}</p>
+      {camper.description ? (
+        <p className={css.desc}>{camper.description}</p>
+      ) : null}
     </section>
   );
 }

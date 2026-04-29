@@ -11,8 +11,6 @@ export type BookingToast = {
 export type BookingDraft = {
   name: string;
   email: string;
-  bookingDate: string | null;
-  comment: string;
 };
 
 type BookingFormStore = {
@@ -31,8 +29,6 @@ type BookingFormStore = {
 const initialDraft: BookingDraft = {
   name: '',
   email: '',
-  bookingDate: null,
-  comment: '',
 };
 
 //===============================================================
@@ -47,13 +43,20 @@ export const useBookingFormStore = create<BookingFormStore>()(
       hideToast: () => set({ toast: null }),
 
       setDraft: (patch) =>
-        set((state) => ({ draft: { ...state.draft, ...patch } })),
+        set((state) => ({
+          draft: {
+            ...state.draft,
+            ...patch,
+          },
+        })),
 
       resetDraft: () => set({ draft: initialDraft }),
     }),
     {
       name: 'booking-form-store',
-      partialize: (state) => ({ draft: state.draft }),
+      partialize: (state) => ({
+        draft: state.draft,
+      }),
     }
   )
 );

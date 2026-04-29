@@ -1,17 +1,12 @@
 import type {
   CamperAmenity,
-  CamperEngine,
-  CamperForm,
+  CamperDetails,
   CamperListItem,
-  CamperTransmission,
 } from '@/types/camper';
-
 import type { FeatureBadgeItem } from '@/components/common/FeatureBadges/FeatureBadges';
 
 import {
   EQUIPMENT_OPTIONS,
-  ENGINE_OPTIONS,
-  TRANSMISSION_OPTIONS,
   formatAmenityLabel,
   formatCamperFormLabel,
   formatEngineLabel,
@@ -19,22 +14,38 @@ import {
 } from '@/lib/constants/catalogFilters';
 
 import {
-  hrefByEquipment,
   hrefByEngine,
+  hrefByEquipment,
   hrefByTransmission,
 } from '@/lib/utils/catalogNav';
 
 //===========================================================================
 
-export function formatVehicleForm(value: CamperForm) {
+type CamperWithFeatures = Pick<
+  CamperListItem | CamperDetails,
+  'transmission' | 'engine' | 'amenities'
+>;
+
+//===========================================================================
+
+function getAmenityIcon(value: CamperAmenity) {
+  return (
+    EQUIPMENT_OPTIONS.find((option) => option.key === value)?.icon ??
+    'icon-grid-2x2'
+  );
+}
+
+//===========================================================================
+
+export function formatVehicleForm(value: CamperListItem['form']) {
   return formatCamperFormLabel(value);
 }
 
-export function formatTransmission(value: CamperTransmission) {
+export function formatTransmission(value: CamperWithFeatures['transmission']) {
   return formatTransmissionLabel(value);
 }
 
-export function formatEngine(value: CamperEngine) {
+export function formatEngine(value: CamperWithFeatures['engine']) {
   return formatEngineLabel(value);
 }
 
@@ -44,52 +55,29 @@ export function formatAmenity(value: CamperAmenity) {
 
 //===========================================================================
 
-function iconByTransmission(value: CamperTransmission) {
-  return (
-    TRANSMISSION_OPTIONS.find((item) => item.value === value)?.icon ??
-    'icon-fuel-pump'
-  );
-}
-
-function iconByEngine(value: CamperEngine) {
-  return (
-    ENGINE_OPTIONS.find((item) => item.value === value)?.icon ??
-    'icon-fuel-pump'
-  );
-}
-
-function iconByAmenity(value: CamperAmenity) {
-  return (
-    EQUIPMENT_OPTIONS.find((item) => item.key === value)?.icon ?? 'icon-wind'
-  );
-}
-
-//===========================================================================
-
 export function buildFeatureBadges(
-  camper: Pick<CamperListItem, 'transmission' | 'engine' | 'amenities'>
+  camper: CamperWithFeatures
 ): FeatureBadgeItem[] {
-  const items: FeatureBadgeItem[] = [];
-
-  items.push({
-    label: formatTransmissionLabel(camper.transmission),
-    icon: iconByTransmission(camper.transmission),
-    href: hrefByTransmission(camper.transmission),
-  });
-
-  items.push({
-    label: formatEngineLabel(camper.engine),
-    icon: iconByEngine(camper.engine),
-    href: hrefByEngine(camper.engine),
-  });
+  const badges: FeatureBadgeItem[] = [
+    {
+      label: formatTransmissionLabel(camper.transmission),
+      icon: 'icon-fuel-pump',
+      href: hrefByTransmission(camper.transmission),
+    },
+    {
+      label: formatEngineLabel(camper.engine),
+      icon: 'icon-fuel-pump',
+      href: hrefByEngine(camper.engine),
+    },
+  ];
 
   camper.amenities.forEach((amenity) => {
-    items.push({
+    badges.push({
       label: formatAmenityLabel(amenity),
-      icon: iconByAmenity(amenity),
+      icon: getAmenityIcon(amenity),
       href: hrefByEquipment(amenity),
     });
   });
 
-  return items;
+  return badges;
 }

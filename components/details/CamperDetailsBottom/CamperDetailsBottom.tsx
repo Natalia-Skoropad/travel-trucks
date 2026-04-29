@@ -27,8 +27,7 @@ type Props = {
 function CamperDetailsBottom({ camper, reviews, className }: Props) {
   const [tab, setTab] = useState<DetailsTab>('features');
 
-  const reviewsCount =
-    reviews.length > 0 ? reviews.length : camper.totalReviews;
+  const reviewsCount = camper.totalReviews ?? reviews.length;
 
   const items = useMemo(
     () => [

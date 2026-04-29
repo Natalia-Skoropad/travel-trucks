@@ -1,86 +1,68 @@
+import { Star } from 'lucide-react';
+
 import type { Review } from '@/types/review';
 
-import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 import css from './ReviewsList.module.css';
 
 //===========================================================================
 
 type Props = {
-  reviews?: Review[];
+  reviews: Review[];
   className?: string;
 };
 
 //===========================================================================
 
-function clampRating(value: number) {
-  return Math.min(5, Math.max(0, Math.round(value)));
-}
-
 function getInitial(name: string) {
-  const value = name.trim();
-
-  return value ? value[0].toUpperCase() : '?';
+  return name.trim().charAt(0).toUpperCase() || '?';
 }
-
-//===========================================================================
-
-function ReviewCard({ review }: { review: Review }) {
-  const stars = clampRating(review.reviewer_rating);
-
-  return (
-    <li className={css.item}>
-      <div className={css.header}>
-        <div className={css.avatar} aria-hidden="true">
-          {getInitial(review.reviewer_name)}
-        </div>
-
-        <div className={css.meta}>
-          <p className={css.name}>{review.reviewer_name}</p>
-
-          <div
-            className={css.stars}
-            role="img"
-            aria-label={`Rating: ${stars} out of 5`}
-          >
-            {Array.from({ length: 5 }).map((_, index) => (
-              <SvgIcon
-                key={index}
-                name="icon-star"
-                size={16}
-                aria-hidden="true"
-                className={`${css.star} ${
-                  index < stars ? css.starOn : css.starOff
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <p className={css.text}>{review.comment}</p>
-    </li>
-  );
-}
-
-//===========================================================================
 
 function ReviewsList({ reviews, className }: Props) {
-  const list = reviews ?? [];
+  if (!reviews.length) {
+    return (
+      <p className={`${css.empty} ${className ?? ''}`}>
+        No reviews yet for this camper.
+      </p>
+    );
+  }
 
   return (
-    <section className={`${css.section} ${className ?? ''}`}>
-      <h2 className="visually-hidden">Reviews</h2>
+    <ul className={`${css.list} ${className ?? ''}`}>
+      {reviews.map((review) => (
+        <li key={review.id} className={css.item}>
+          <div className={css.head}>
+            <span className={css.avatar} aria-hidden="true">
+              {getInitial(review.reviewer_name)}
+            </span>
 
-      {!list.length ? (
-        <p className={css.empty}>No reviews yet.</p>
-      ) : (
-        <ul className={css.list}>
-          {list.map((review) => (
-            <ReviewCard key={review.id} review={review} />
-          ))}
-        </ul>
-      )}
-    </section>
+            <div>
+              <h3 className={css.name}>{review.reviewer_name}</h3>
+
+              <div
+                className={css.rating}
+                aria-label={`Rating ${review.reviewer_rating} out of 5`}
+              >
+                {Array.from({ length: 5 }, (_, index) => {
+                  const isActive = index < review.reviewer_rating;
+
+                  return (
+                    <Star
+                      key={index}
+                      className={`${css.star} ${
+                        isActive ? css.starActive : ''
+                      }`}
+                      aria-hidden="true"
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <p className={css.comment}>{review.comment}</p>
+        </li>
+      ))}
+    </ul>
   );
 }
 

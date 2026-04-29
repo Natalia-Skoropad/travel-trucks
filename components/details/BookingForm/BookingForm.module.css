@@ -5,9 +5,8 @@
 .card {
   border: 1px solid var(--gray-light);
   border-radius: 10px;
-  background: #fff;
-
-  padding: 24px 34px;
+  background: var(--white);
+  padding: 24px;
 }
 
 .title {
@@ -44,8 +43,7 @@
   background-color: #fff2f2;
 }
 
-.input,
-.textarea {
+.input {
   width: 100%;
   border: none;
   outline: none;
@@ -64,23 +62,15 @@
   transition: box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.textarea {
-  min-height: 300px;
-  resize: none;
-}
-
-.input:hover,
-.textarea:hover {
+.input:hover {
   background: rgba(0, 0, 0, 0.045);
 }
 
-.fieldError .input:hover,
-.fieldError .textarea:hover {
+.fieldError .input:hover {
   background-color: #ffecec;
 }
 
-.input:focus,
-.textarea:focus {
+.input:focus {
   box-shadow: 0 0 0 2px rgba(230, 68, 64, 0.25);
 }
 
@@ -112,18 +102,15 @@
   background-color: #ffe7e7;
 }
 
-.input::placeholder,
-.textarea::placeholder {
+.input::placeholder {
   color: rgba(16, 24, 40, 0.45);
 }
 
-.input,
-.textarea {
+.input {
   color: #101828;
 }
 
-.input:not(:placeholder-shown),
-.textarea:not(:placeholder-shown) {
+.input:not(:placeholder-shown) {
   color: #101828;
 }
 
@@ -168,34 +155,8 @@
   border-radius: 8px;
 }
 
-.withCounter {
-  padding-right: 72px;
-}
-
-.counterIn {
-  position: absolute;
-  right: 16px;
-  top: 24px;
-
-  font-size: 12px;
-  line-height: 1.2;
-  color: rgba(16, 24, 40, 0.45);
-
-  pointer-events: none;
-  user-select: none;
-}
-
-.counterInTextarea {
-  top: auto;
-  bottom: 20px;
-}
-
 @media only screen and (min-width: 1440px) {
   .card {
-    padding: 44px 52px;
-  }
-
-  .textarea {
-    min-height: 118px;
+    padding: 32px;
   }
 }

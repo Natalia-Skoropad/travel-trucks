@@ -1,16 +1,18 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import * as Yup from 'yup';
+
 import {
-  Formik,
-  Form,
   Field,
-  type FormikHelpers,
+  Form,
+  Formik,
   type FieldProps,
+  type FormikHelpers,
 } from 'formik';
 
 import { createBookingRequest } from '@/lib/api/campersApi';
+import { useBookingFormStore } from '@/lib/store/bookingFormStore';
 
 import Button from '@/components/common/Button/Button';
 import Toast from '@/components/common/Toast/Toast';
@@ -30,7 +32,7 @@ type Values = {
 
 //===============================================================
 
-const NAME_MAX = 20;
+const NAME_MAX = 40;
 const EMAIL_MAX = 64;
 
 //===============================================================
@@ -42,10 +44,13 @@ function clampText(value: string, max: number) {
 //===============================================================
 
 function BookingForm({ camperId }: Props) {
-  const [toast, setToast] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
+  const toast = useBookingFormStore((state) => state.toast);
+  const showToast = useBookingFormStore((state) => state.showToast);
+  const hideToast = useBookingFormStore((state) => state.hideToast);
+
+  const draft = useBookingFormStore((state) => state.draft);
+  const setDraft = useBookingFormStore((state) => state.setDraft);
+  const resetDraft = useBookingFormStore((state) => state.resetDraft);
 
   const schema = useMemo(
     () =>
@@ -64,145 +69,155 @@ function BookingForm({ camperId }: Props) {
     []
   );
 
-  const initialValues: Values = {
-    name: '',
-    email: '',
-  };
+  const initialValues: Values = useMemo(
+    () => ({
+      name: draft.name ?? '',
+      email: draft.email ?? '',
+    }),
+    [draft.email, draft.name]
+  );
 
-  async function onSubmit(values: Values, helpers: FormikHelpers<Values>) {
-    setToast(null);
+  const handleSubmit = async (
+    values: Values,
+    helpers: FormikHelpers<Values>
+  ) => {
+    const payload = {
+      name: values.name.trim(),
+      email: values.email.trim(),
+    };
 
     try {
-      const response = await createBookingRequest(camperId, {
-        name: values.name.trim(),
-        email: values.email.trim(),
-      });
+      const response = await createBookingRequest(camperId, payload);
 
-      helpers.resetForm();
-
-      setToast({
+      showToast({
         type: 'success',
         message:
-          response.message || 'Booking request sent! We will contact you soon.',
+          response.message ||
+          'Booking request sent successfully. We will contact you soon.',
+      });
+
+      resetDraft();
+      helpers.resetForm({
+        values: {
+          name: '',
+          email: '',
+        },
       });
     } catch {
-      setToast({
+      showToast({
         type: 'error',
         message: 'Something went wrong. Please try again.',
       });
     } finally {
       helpers.setSubmitting(false);
     }
-  }
+  };
 
   return (
-    <section className={css.section}>
-      <h2 className="visually-hidden">Booking form</h2>
-
+    <section className={css.section} aria-labelledby="booking-title">
       <div className={css.card}>
-        <h3 className={css.title}>Book your campervan now</h3>
+        <h2 id="booking-title" className={css.title}>
+          Book your campervan now
+        </h2>
+
         <p className={css.subtitle}>
           Stay connected! We are always ready to help you.
         </p>
 
-        <Formik
+        <Formik<Values>
           initialValues={initialValues}
           validationSchema={schema}
-          onSubmit={onSubmit}
           validateOnMount
+          enableReinitialize
+          onSubmit={handleSubmit}
         >
           {({
-            values,
             errors,
             touched,
-            setFieldValue,
             isSubmitting,
             isValid,
+            dirty,
+            setFieldValue,
           }) => {
-            const canSubmit =
-              isValid &&
-              values.name.trim().length > 0 &&
-              values.email.trim().length > 0 &&
-              !isSubmitting;
-
-            const nameHasError = Boolean(touched.name && errors.name);
-            const emailHasError = Boolean(touched.email && errors.email);
+            const canSubmit = isValid && dirty && !isSubmitting;
 
             return (
               <Form className={css.form} noValidate>
-                <div
-                  className={`${css.field} ${
-                    nameHasError ? css.fieldError : ''
-                  }`}
-                >
-                  <label className="visually-hidden" htmlFor="name">
-                    Name
-                  </label>
+                <Field name="name">
+                  {({ field }: FieldProps<string>) => {
+                    const hasError = Boolean(touched.name && errors.name);
 
-                  <Field name="name">
-                    {({ field }: FieldProps<string>) => (
-                      <input
-                        {...field}
-                        id="name"
-                        type="text"
-                        placeholder="Name*"
-                        className={`${css.input} ${css.withCounter}`}
-                        maxLength={NAME_MAX}
-                        onChange={(event) => {
-                          const next = clampText(event.target.value, NAME_MAX);
-                          void setFieldValue('name', next, true);
-                        }}
-                      />
-                    )}
-                  </Field>
+                    return (
+                      <div
+                        className={`${css.field} ${
+                          hasError ? css.fieldError : ''
+                        }`}
+                      >
+                        <input
+                          {...field}
+                          type="text"
+                          className={css.input}
+                          placeholder="Name*"
+                          autoComplete="name"
+                          maxLength={NAME_MAX}
+                          onChange={(event) => {
+                            const next = clampText(
+                              event.target.value,
+                              NAME_MAX
+                            );
 
-                  <span className={css.counterIn} aria-hidden="true">
-                    {values.name.length}/{NAME_MAX}
-                  </span>
+                            void setFieldValue('name', next, true);
+                            setDraft({ name: next });
+                          }}
+                        />
 
-                  {nameHasError ? (
-                    <span className={css.error} aria-live="polite">
-                      {String(errors.name)}
-                    </span>
-                  ) : null}
-                </div>
+                        {hasError ? (
+                          <span className={css.error} aria-live="polite">
+                            {String(errors.name)}
+                          </span>
+                        ) : null}
+                      </div>
+                    );
+                  }}
+                </Field>
 
-                <div
-                  className={`${css.field} ${
-                    emailHasError ? css.fieldError : ''
-                  }`}
-                >
-                  <label className="visually-hidden" htmlFor="email">
-                    Email
-                  </label>
+                <Field name="email">
+                  {({ field }: FieldProps<string>) => {
+                    const hasError = Boolean(touched.email && errors.email);
 
-                  <Field name="email">
-                    {({ field }: FieldProps<string>) => (
-                      <input
-                        {...field}
-                        id="email"
-                        type="email"
-                        placeholder="Email*"
-                        className={`${css.input} ${css.withCounter}`}
-                        maxLength={EMAIL_MAX}
-                        onChange={(event) => {
-                          const next = clampText(event.target.value, EMAIL_MAX);
-                          void setFieldValue('email', next, true);
-                        }}
-                      />
-                    )}
-                  </Field>
+                    return (
+                      <div
+                        className={`${css.field} ${
+                          hasError ? css.fieldError : ''
+                        }`}
+                      >
+                        <input
+                          {...field}
+                          type="email"
+                          className={css.input}
+                          placeholder="Email*"
+                          autoComplete="email"
+                          maxLength={EMAIL_MAX}
+                          onChange={(event) => {
+                            const next = clampText(
+                              event.target.value,
+                              EMAIL_MAX
+                            );
 
-                  <span className={css.counterIn} aria-hidden="true">
-                    {values.email.length}/{EMAIL_MAX}
-                  </span>
+                            void setFieldValue('email', next, true);
+                            setDraft({ email: next });
+                          }}
+                        />
 
-                  {emailHasError ? (
-                    <span className={css.error} aria-live="polite">
-                      {String(errors.email)}
-                    </span>
-                  ) : null}
-                </div>
+                        {hasError ? (
+                          <span className={css.error} aria-live="polite">
+                            {String(errors.email)}
+                          </span>
+                        ) : null}
+                      </div>
+                    );
+                  }}
+                </Field>
 
                 <div className={css.actions}>
                   <Button type="submit" disabled={!canSubmit}>
@@ -216,11 +231,7 @@ function BookingForm({ camperId }: Props) {
       </div>
 
       {toast ? (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
+        <Toast type={toast.type} message={toast.message} onClose={hideToast} />
       ) : null}
     </section>
   );
