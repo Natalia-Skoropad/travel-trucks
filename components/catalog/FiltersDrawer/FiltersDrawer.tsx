@@ -1,8 +1,9 @@
-'use client';
-
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useEscapeToClose } from '@/hooks/useEscapeToClose';
 
 import css from './FiltersDrawer.module.css';
 
@@ -34,32 +35,15 @@ function FiltersDrawer({ children, onOpenFilters }: Props) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
     const timeoutId = window.setTimeout(() => {
       closeButtonRef.current?.focus();
     }, 0);
 
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.clearTimeout(timeoutId);
-    };
+    return () => window.clearTimeout(timeoutId);
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        close();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, close]);
+  useEscapeToClose(isOpen, close);
+  useBodyScrollLock(isOpen);
 
   if (!isOpen) return null;
 

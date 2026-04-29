@@ -1,44 +1,33 @@
-import type { Metadata } from 'next';
 import Image from 'next/image';
 
 import ButtonLink from '@/components/common/Button/ButtonLink';
+
+import { ROUTES } from '@/lib/constants/routes';
+import {
+  DEFAULT_OG_ALT,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_SITE_DESCRIPTION,
+} from '@/lib/constants/metadata';
+import { buildMetadata } from '@/lib/seo/buildMetadata';
+
 import css from './page.module.css';
 
 //===========================================================================
 
-const SITE_URL = 'https://travel-trucks-five-liart.vercel.app/';
+const HOME_TITLE = 'Campers of your dreams';
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: 'TravelTrucks | Campers of your dreams',
-  description:
-    'Discover and rent campers for your next adventure. Browse the catalog, explore features, read reviews, and book your camper with TravelTrucks.',
+const HOME_DESCRIPTION =
+  'Discover and rent campers for your next adventure. Browse the catalog, explore features, read reviews, and book your camper with TravelTrucks.';
 
-  openGraph: {
-    title: 'TravelTrucks | Campers of your dreams',
-    description:
-      'Discover and rent campers for your next adventure. Browse the catalog, explore features, read reviews, and book your camper with TravelTrucks.',
-    url: SITE_URL,
-    siteName: 'TravelTrucks',
-    images: [
-      {
-        url: '/background-picture.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'TravelTrucks camper rental',
-      },
-    ],
-    type: 'website',
-  },
+//===========================================================================
 
-  twitter: {
-    card: 'summary_large_image',
-    title: 'TravelTrucks | Campers of your dreams',
-    description:
-      'Discover and rent campers for your next adventure with TravelTrucks.',
-    images: ['/background-picture.jpg'],
-  },
-};
+export const metadata = buildMetadata({
+  title: HOME_TITLE,
+  description: HOME_DESCRIPTION || DEFAULT_SITE_DESCRIPTION,
+  path: ROUTES.HOME,
+  image: DEFAULT_OG_IMAGE,
+  imageAlt: DEFAULT_OG_ALT,
+});
 
 //===========================================================================
 
@@ -46,7 +35,7 @@ function Home() {
   return (
     <main className={css.page}>
       <Image
-        src="/background-picture.jpg"
+        src={DEFAULT_OG_IMAGE}
         alt=""
         fill
         priority
@@ -57,11 +46,12 @@ function Home() {
       <div className="container">
         <div className={css.heroContent}>
           <h1 className={css.title}>Campers of your dreams</h1>
+
           <p className={css.text}>
             You can find everything you want in our catalog
           </p>
 
-          <ButtonLink href="/catalog">View Now</ButtonLink>
+          <ButtonLink href={ROUTES.CATALOG}>View Now</ButtonLink>
         </div>
       </div>
     </main>

@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
+import { useBackdropClick } from '@/hooks/useBackdropClick';
+import { useEscapeToClose } from '@/hooks/useEscapeToClose';
+
 import css from './GalleryModal.module.css';
 
 //===============================================================
@@ -18,6 +22,7 @@ type Props = {
 
 function clampIndex(i: number, len: number) {
   if (len === 0) return 0;
+
   return ((i % len) + len) % len;
 }
 
@@ -32,45 +37,50 @@ function GalleryModal({ images, startIndex, onClose }: Props) {
   );
 
   const [index, setIndex] = useState(safeStart);
-  useEffect(() => setIndex(safeStart), [safeStart]);
 
-  const prev = () => setIndex((i) => clampIndex(i - 1, total));
-  const next = () => setIndex((i) => clampIndex(i + 1, total));
+  const handleBackdropClick = useBackdropClick(onClose);
+
+  useEscapeToClose(true, onClose);
+  useBodyScrollLock(true);
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft') prev();
-      if (e.key === 'ArrowRight') next();
+    setIndex(safeStart);
+  }, [safeStart]);
+
+  useEffect(() => {
+    if (!total) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        setIndex((current) => clampIndex(current - 1, total));
+      }
+
+      if (event.key === 'ArrowRight') {
+        setIndex((current) => clampIndex(current + 1, total));
+      }
     };
 
-    document.addEventListener('keydown', onKeyDown);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
 
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = prevOverflow;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [total, onClose]);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [total]);
 
   if (!total) return null;
 
   return (
     <div
       className={css.backdrop}
-      onClick={onClose}
+      onMouseDown={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-label="Gallery modal"
     >
-      <div className={css.modal} onClick={(e) => e.stopPropagation()}>
+      <div className={css.modal}>
         <button
           type="button"
           className={css.close}
           onClick={onClose}
-          aria-label="Close"
+          aria-label="Close gallery"
         >
           <X size={18} aria-hidden="true" />
         </button>
@@ -78,7 +88,7 @@ function GalleryModal({ images, startIndex, onClose }: Props) {
         <button
           type="button"
           className={`${css.arrow} ${css.arrowLeft}`}
-          onClick={prev}
+          onClick={() => setIndex((current) => clampIndex(current - 1, total))}
           aria-label="Previous image"
         >
           <ChevronLeft size={22} aria-hidden="true" />
@@ -99,7 +109,7 @@ function GalleryModal({ images, startIndex, onClose }: Props) {
         <button
           type="button"
           className={`${css.arrow} ${css.arrowRight}`}
-          onClick={next}
+          onClick={() => setIndex((current) => clampIndex(current + 1, total))}
           aria-label="Next image"
         >
           <ChevronRight size={22} aria-hidden="true" />

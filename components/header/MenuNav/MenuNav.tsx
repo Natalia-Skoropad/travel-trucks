@@ -3,44 +3,36 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { NAV_ITEMS } from '@/lib/constants/navigation';
+
 import css from './MenuNav.module.css';
 
-//===============================================================
-
-function isActive(pathname: string, href: string) {
-  if (href === '/') return pathname === '/';
-  return pathname === href || pathname.startsWith(href + '/');
-}
-
-//===============================================================
+//===========================================================================
 
 function MenuNav() {
   const pathname = usePathname();
 
   return (
-    <nav className={css.menuNav} aria-label="Primary navigation">
-      <ul className={css.menuList}>
-        <li>
-          <Link
-            href="/"
-            className={`${css.link} ${
-              isActive(pathname, '/') ? css.active : ''
-            }`}
-          >
-            Home
-          </Link>
-        </li>
+    <nav className={css.nav} aria-label="Main navigation">
+      <ul className={css.list}>
+        {NAV_ITEMS.map((item) => {
+          const isActive =
+            item.href === '/'
+              ? pathname === item.href
+              : pathname.startsWith(item.href);
 
-        <li>
-          <Link
-            href="/catalog"
-            className={`${css.link} ${
-              isActive(pathname, '/catalog') ? css.active : ''
-            }`}
-          >
-            Catalog
-          </Link>
-        </li>
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className={`${css.link} ${isActive ? css.active : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
