@@ -5,7 +5,9 @@ import {
 } from '@tanstack/react-query';
 
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+
+import { buildCamperHref, getCamperIdFromSlug } from '@/lib/utils/camperSlug';
 
 import {
   fetchCamperByIdFromServer,
@@ -58,7 +60,9 @@ async function generateCatalogPageMetadata(
   });
 }
 
-async function generateCamperPageMetadata(id: string): Promise<Metadata> {
+async function generateCamperPageMetadata(slug: string): Promise<Metadata> {
+  const id = getCamperIdFromSlug(slug);
+
   try {
     const camper = await fetchCamperByIdFromServer(id);
 
@@ -116,7 +120,9 @@ async function CatalogListPage({ segments }: { segments?: string[] }) {
   );
 }
 
-async function CamperDetailsPage({ id }: { id: string }) {
+async function CamperDetailsPage({ slug }: { slug: string }) {
+  const id = getCamperIdFromSlug(slug);
+
   const queryClient = new QueryClient();
 
   let camper: Awaited<ReturnType<typeof fetchCamperByIdFromServer>>;
@@ -135,6 +141,12 @@ async function CamperDetailsPage({ id }: { id: string }) {
     ]);
   } catch {
     notFound();
+  }
+
+  const canonicalHref = buildCamperHref(camper);
+
+  if (`/catalog/${slug}` !== canonicalHref) {
+    redirect(canonicalHref);
   }
 
   return (
@@ -166,7 +178,7 @@ async function CatalogSegmentsPage({ params }: PageProps) {
   const { segments } = await params;
 
   if (isCatalogDetailsPath(segments)) {
-    return <CamperDetailsPage id={segments![0]} />;
+    return <CamperDetailsPage slug={segments![0]} />;
   }
 
   return <CatalogListPage segments={segments} />;

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import type { CamperDetails } from '@/types/camper';
+import { buildCamperHref } from '@/lib/utils/camperSlug';
 
 import {
   DEFAULT_OG_ALT,
@@ -66,7 +67,7 @@ export function getCamperOgImage(camper: CamperDetails) {
 export function buildCamperMetadata(camper: CamperDetails): Metadata {
   const title = buildCamperTitle(camper);
   const description = buildCamperDescription(camper);
-  const url = buildAbsoluteUrl(`/catalog/${camper.id}`);
+  const url = buildAbsoluteUrl(buildCamperHref(camper));
   const image = getCamperOgImage(camper);
 
   return {

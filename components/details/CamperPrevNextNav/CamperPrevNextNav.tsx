@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchCampersFromServer } from '@/lib/api/campersApi';
 import type { CamperListItem } from '@/types/camper';
 
+import { buildCamperHref } from '@/lib/utils/camperSlug';
+
 import css from './CamperPrevNextNav.module.css';
 
 //===============================================================
@@ -64,7 +66,7 @@ async function CamperPrevNextNav({ currentId }: Props) {
       <ul className={css.list}>
         <li>
           {prev ? (
-            <Link href={`/catalog/${prev.id}`} className={css.btn}>
+            <Link href={buildCamperHref(prev)} className={css.btn}>
               <ChevronLeft className={css.icon} aria-hidden="true" />
               <span className={css.label}>Previous car</span>
             </Link>
@@ -78,7 +80,7 @@ async function CamperPrevNextNav({ currentId }: Props) {
 
         <li>
           {next ? (
-            <Link href={`/catalog/${next.id}`} className={css.btn}>
+            <Link href={buildCamperHref(next)} className={css.btn}>
               <span className={css.label}>Next car</span>
               <ChevronRight className={css.icon} aria-hidden="true" />
             </Link>

@@ -12,6 +12,8 @@ import {
 } from '@/lib/utils/camperBadges';
 import { useFavorites } from '@/hooks/useFavorites';
 
+import { buildCamperHref } from '@/lib/utils/camperSlug';
+
 import RatingLocation from '@/components/common/RatingLocation/RatingLocation';
 import FeatureBadges from '@/components/common/FeatureBadges/FeatureBadges';
 import ButtonLink from '@/components/common/Button/ButtonLink';
@@ -121,7 +123,7 @@ function CamperCard({ item, className }: Props) {
         <FeatureBadges items={badges} className={css.badges} />
 
         <div className={css.actions}>
-          <ButtonLink href={`/catalog/${item.id}`}>Show more</ButtonLink>
+          <ButtonLink href={buildCamperHref(item)}>Show more</ButtonLink>
         </div>
       </div>
     </article>
