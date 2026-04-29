@@ -7,6 +7,7 @@ import type {
 } from '@/lib/constants/catalogFilters';
 
 import { DEFAULT_CATALOG_FILTERS } from '@/lib/constants/catalogDefaults';
+import { buildCatalogPath } from '@/lib/utils/catalogSegments';
 
 //===========================================================================
 
@@ -28,24 +29,7 @@ export function buildCatalogHref(patch: PartialFilters) {
     },
   };
 
-  const params = new URLSearchParams();
-
-  const location = next.location.trim();
-
-  if (location) params.set('location', location);
-  if (next.form) params.set('form', next.form);
-  if (next.engine) params.set('engine', next.engine);
-  if (next.transmission) params.set('transmission', next.transmission);
-
-  (Object.keys(next.equipment) as EquipmentKey[]).forEach((key) => {
-    if (next.equipment[key]) {
-      params.set(key, '1');
-    }
-  });
-
-  const query = params.toString();
-
-  return query ? `/catalog?${query}` : '/catalog';
+  return buildCatalogPath(next);
 }
 
 //===========================================================================

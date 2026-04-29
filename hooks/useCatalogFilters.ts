@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
 import { DEFAULT_CATALOG_FILTERS } from '@/lib/constants/catalogDefaults';
-import { filtersToSearchParams } from '@/lib/utils/catalogUrl';
+import { buildCatalogPath } from '@/lib/utils/catalogSegments';
 import { isCatalogFiltersApplied } from '@/lib/utils/catalogQuery';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
@@ -16,12 +16,6 @@ function cloneFilters(filters: CatalogFiltersValue): CatalogFiltersValue {
     ...filters,
     equipment: { ...filters.equipment },
   };
-}
-
-function buildCatalogHref(filters: CatalogFiltersValue) {
-  const query = filtersToSearchParams(filters).toString();
-
-  return query ? `/catalog?${query}` : '/catalog';
 }
 
 //===========================================================================
@@ -47,10 +41,10 @@ export function useCatalogFilters(initialFilters: CatalogFiltersValue) {
     [filters, effectiveLocation]
   );
 
-  const lastHrefRef = useRef(buildCatalogHref(effectiveFilters));
+  const lastHrefRef = useRef(buildCatalogPath(effectiveFilters));
 
   useEffect(() => {
-    const href = buildCatalogHref(effectiveFilters);
+    const href = buildCatalogPath(effectiveFilters);
 
     if (href === lastHrefRef.current) return;
 
@@ -65,6 +59,7 @@ export function useCatalogFilters(initialFilters: CatalogFiltersValue) {
     effectiveFilters.form,
     effectiveFilters.engine,
     effectiveFilters.transmission,
+    effectiveFilters.sort,
     JSON.stringify(effectiveFilters.equipment),
   ]);
 

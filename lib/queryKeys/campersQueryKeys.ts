@@ -16,6 +16,7 @@ function normalizeFilters(filters: CatalogFiltersValue) {
     transmission: filters.transmission || '',
     engine: filters.engine || '',
     equipment: getActiveEquipment(filters),
+    sort: filters.sort || '',
   };
 }
 

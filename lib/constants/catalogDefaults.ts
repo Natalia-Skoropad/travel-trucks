@@ -8,4 +8,5 @@ export const DEFAULT_CATALOG_FILTERS: CatalogFiltersValue = {
   engine: '',
   transmission: '',
   equipment: {},
+  sort: '',
 };

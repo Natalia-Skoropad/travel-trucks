@@ -4,6 +4,7 @@ import type {
   CamperForm,
   CamperTransmission,
 } from '@/types/camper';
+import type { CamperSort } from '@/types/catalog';
 
 //===========================================================================
 
@@ -23,6 +24,8 @@ export type CatalogFiltersValue = {
   transmission: CamperTransmission | '';
 
   equipment: Partial<Record<EquipmentKey, boolean>>;
+
+  sort: CamperSort | '';
 };
 
 //===========================================================================
@@ -58,6 +61,13 @@ export const AMENITY_LABELS: Record<CamperAmenity, string> = {
   water: 'Water',
 };
 
+export const SORT_LABELS: Record<CamperSort, string> = {
+  'price-asc': 'Price: low to high',
+  'price-desc': 'Price: high to low',
+  'rating-asc': 'Rating: low to high',
+  'rating-desc': 'Rating: high to low',
+};
+
 //===========================================================================
 
 export function formatCamperFormLabel(value: CamperForm) {
@@ -74,6 +84,10 @@ export function formatEngineLabel(value: CamperEngine) {
 
 export function formatAmenityLabel(value: CamperAmenity) {
   return AMENITY_LABELS[value];
+}
+
+export function formatSortLabel(value: CamperSort) {
+  return SORT_LABELS[value];
 }
 
 //===========================================================================
@@ -181,10 +195,22 @@ export const ENGINE_OPTIONS: Array<{
 
 //===========================================================================
 
+export const SORT_OPTIONS: Array<{
+  value: CamperSort;
+  label: string;
+}> = [
+  { value: 'price-asc', label: SORT_LABELS['price-asc'] },
+  { value: 'price-desc', label: SORT_LABELS['price-desc'] },
+  { value: 'rating-desc', label: SORT_LABELS['rating-desc'] },
+  { value: 'rating-asc', label: SORT_LABELS['rating-asc'] },
+];
+
+//===========================================================================
+
 export const CAMPER_FORM_VALUES = VEHICLE_FORMS.map((item) => item.value);
 export const TRANSMISSION_VALUES = TRANSMISSION_OPTIONS.map(
   (item) => item.value
 );
-
 export const ENGINE_VALUES = ENGINE_OPTIONS.map((item) => item.value);
 export const AMENITY_VALUES = EQUIPMENT_OPTIONS.map((item) => item.key);
+export const SORT_VALUES = SORT_OPTIONS.map((item) => item.value);

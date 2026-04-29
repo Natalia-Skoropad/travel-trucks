@@ -7,7 +7,7 @@ import { fetchCampers } from '@/lib/api/campersApi';
 import { CATALOG_PER_PAGE } from '@/lib/constants/pagination';
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
 import { campersQueryKeys } from '@/lib/queryKeys/campersQueryKeys';
-import { buildCampersQuery } from '@/lib/utils/catalogQuery';
+import { buildCatalogApiParams } from '@/lib/utils/catalogSegments';
 
 //===========================================================================
 
@@ -16,7 +16,7 @@ export function useCatalogCampers(filters: CatalogFiltersValue) {
     queryKey: campersQueryKeys.list(filters, CATALOG_PER_PAGE),
     queryFn: ({ pageParam }) =>
       fetchCampers(
-        buildCampersQuery(filters, Number(pageParam), CATALOG_PER_PAGE)
+        buildCatalogApiParams(filters, Number(pageParam), CATALOG_PER_PAGE)
       ),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
