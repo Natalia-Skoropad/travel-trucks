@@ -15,13 +15,13 @@ import { useFavorites } from '@/hooks/useFavorites';
 import CatalogFilters from '@/components/catalog/CatalogFilters/CatalogFilters';
 import CatalogPageShell from '@/components/catalog/CatalogPageShell/CatalogPageShell';
 import CampersList from '@/components/catalog/CampersList/CampersList';
+import CatalogSearch from '@/components/catalog/CatalogSearch/CatalogSearch';
+import CatalogSort from '@/components/catalog/CatalogSort/CatalogSort';
 import Button from '@/components/common/Button/Button';
 import Pagination from '@/components/common/Pagination/Pagination';
 import Tabs from '@/components/common/Tabs/Tabs';
 
 import css from '@/components/catalog/CatalogPageShell/CatalogPageShell.module.css';
-
-//===========================================================================
 
 type Props = {
   initialFilters: CatalogFiltersValue;
@@ -30,13 +30,9 @@ type Props = {
 
 type TabValue = 'all' | 'favorites';
 
-//===========================================================================
-
 function uniqSorted(list: string[]) {
   return Array.from(new Set(list)).sort((a, b) => a.localeCompare(b));
 }
-
-//===========================================================================
 
 function CatalogPageClient({ initialFilters, initialPage }: Props) {
   const openFiltersRef = useRef<(() => void) | null>(null);
@@ -61,7 +57,13 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
   const [favoriteItems, setFavoriteItems] = useState<CamperListItem[]>([]);
   const [isFavLoading, setIsFavLoading] = useState(false);
 
-  //===========================================================================
+  const updateFilters = (patch: Partial<CatalogFiltersValue>) => {
+    setFilters({
+      ...filters,
+      ...patch,
+      equipment: patch.equipment ?? { ...filters.equipment },
+    });
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -106,8 +108,6 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
     };
   }, [tab, favoriteIds]);
 
-  //===========================================================================
-
   const visibleItems = tab === 'favorites' ? favoriteItems : campers;
 
   const tabs = [
@@ -136,7 +136,7 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
 
   const isCatalogBusy = isPending || isFetching;
 
-  const filtersUI = (
+  const desktopFilters = (
     <CatalogFilters
       value={filters}
       onChange={setFilters}
@@ -144,33 +144,63 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
       isResetDisabled={!filtersApplied || isCatalogBusy}
       isFiltering={isCatalogBusy}
       locationSuggestions={locationSuggestions}
+      showSearch
+      showSort={false}
     />
   );
 
-  //===========================================================================
+  const drawerFilters = (
+    <CatalogFilters
+      value={filters}
+      onChange={setFilters}
+      onReset={resetFilters}
+      isResetDisabled={!filtersApplied || isCatalogBusy}
+      isFiltering={isCatalogBusy}
+      locationSuggestions={locationSuggestions}
+      showSearch={false}
+      showSort
+    />
+  );
 
   return (
     <CatalogPageShell
-      filters={filtersUI}
+      desktopFilters={desktopFilters}
+      drawerFilters={drawerFilters}
       onOpenFilters={(open) => {
         openFiltersRef.current = open;
       }}
     >
-      <Tabs
-        items={tabs}
-        value={tab}
-        onChange={setTab}
-        ariaLabel="Catalog tabs"
-        renderPanel={() => <span aria-hidden="true" />}
-      />
+      <div className={css.catalogTop}>
+        <Tabs
+          items={tabs}
+          value={tab}
+          onChange={setTab}
+          ariaLabel="Catalog tabs"
+          renderPanel={() => <span aria-hidden="true" />}
+        />
 
-      <div className={css.toolbar}>
+        <CatalogSort
+          value={filters.sort}
+          onChange={(sort) => updateFilters({ sort })}
+          className={css.sortDesktop}
+        />
+      </div>
+
+      <div className={css.mobileSearchRow}>
+        <CatalogSearch
+          id="catalog-search-mobile"
+          value={filters.search}
+          onChange={(search) => updateFilters({ search })}
+          className={css.mobileSearch}
+        />
+
         <Button
           variant="filter"
           iconLeft={<Filter className={css.filterBtn} />}
           onClick={() => openFiltersRef.current?.()}
+          className={css.mobileFilterButton}
         >
-          All filters
+          Filters
         </Button>
       </div>
 

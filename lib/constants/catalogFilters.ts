@@ -4,6 +4,7 @@ import type {
   CamperForm,
   CamperTransmission,
 } from '@/types/camper';
+
 import type { CamperSort } from '@/types/catalog';
 
 //===========================================================================
@@ -17,6 +18,8 @@ export type VehicleEngine = CamperEngine;
 //===========================================================================
 
 export type CatalogFiltersValue = {
+  search: string;
+
   location: string;
   form: CamperForm | '';
 
@@ -64,8 +67,8 @@ export const AMENITY_LABELS: Record<CamperAmenity, string> = {
 export const SORT_LABELS: Record<CamperSort, string> = {
   'price-asc': 'Price: low to high',
   'price-desc': 'Price: high to low',
-  'rating-asc': 'Rating: low to high',
   'rating-desc': 'Rating: high to low',
+  'rating-asc': 'Rating: low to high',
 };
 
 //===========================================================================
@@ -208,9 +211,11 @@ export const SORT_OPTIONS: Array<{
 //===========================================================================
 
 export const CAMPER_FORM_VALUES = VEHICLE_FORMS.map((item) => item.value);
+
 export const TRANSMISSION_VALUES = TRANSMISSION_OPTIONS.map(
   (item) => item.value
 );
+
 export const ENGINE_VALUES = ENGINE_OPTIONS.map((item) => item.value);
 export const AMENITY_VALUES = EQUIPMENT_OPTIONS.map((item) => item.key);
 export const SORT_VALUES = SORT_OPTIONS.map((item) => item.value);

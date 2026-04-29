@@ -80,6 +80,12 @@ export function buildCatalogDescription(
 
   const details: string[] = [];
 
+  const search = filters.search.trim();
+
+  if (search) {
+    details.push(`matching "${search}"`);
+  }
+
   if (location) {
     details.push(`in ${location}`);
   }
@@ -118,6 +124,10 @@ export function buildCatalogSeoText(filters: CatalogFiltersValue) {
 
   const highlights: string[] = [];
 
+  if (filters.search.trim()) {
+    highlights.push(`Search: ${filters.search.trim()}`);
+  }
+
   if (location) {
     highlights.push(location);
   }
@@ -148,6 +158,14 @@ export function buildCatalogSeoText(filters: CatalogFiltersValue) {
       highlighted: false,
     },
   ];
+
+  if (filters.search.trim()) {
+    descriptionParts.push({ text: ' matching ', highlighted: false });
+    descriptionParts.push({
+      text: filters.search.trim(),
+      highlighted: true,
+    });
+  }
 
   if (location) {
     descriptionParts.push({ text: ' in ', highlighted: false });

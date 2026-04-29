@@ -1,5 +1,6 @@
 import type { CamperAmenity } from '@/types/camper';
 import type { CamperSort, CampersQuery } from '@/types/catalog';
+
 import type {
   CatalogFiltersValue,
   EquipmentKey,
@@ -20,6 +21,7 @@ import {
   formatSortLabel,
   formatTransmissionLabel,
 } from '@/lib/constants/catalogFilters';
+
 import { DEFAULT_CATALOG_FILTERS } from '@/lib/constants/catalogDefaults';
 import { CATALOG_PER_PAGE } from '@/lib/constants/pagination';
 import { LOCATIONS } from '@/lib/constants/locations';
@@ -27,6 +29,7 @@ import { LOCATIONS } from '@/lib/constants/locations';
 //===========================================================================
 
 const PREFIX = {
+  search: 'search-',
   location: 'location-',
   form: 'form-',
   transmission: 'transmission-',
@@ -60,8 +63,12 @@ function slugify(value: string) {
 }
 
 function unslugify(value: string) {
+  return value.split('-').filter(Boolean).join(' ');
+}
+
+function formatSearchLabel(value: string) {
   return value
-    .split('-')
+    .split(' ')
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
@@ -106,6 +113,7 @@ function cloneDefaultFilters(): CatalogFiltersValue {
 
 export function isCatalogFilterSegment(segment: string) {
   return (
+    segment.startsWith(PREFIX.search) ||
     segment.startsWith(PREFIX.location) ||
     segment.startsWith(PREFIX.form) ||
     segment.startsWith(PREFIX.transmission) ||
@@ -131,11 +139,17 @@ export function parseCatalogSegments(
   let page = 1;
 
   for (const segment of segments) {
+    if (segment.startsWith(PREFIX.search)) {
+      const slug = stripPrefix(segment, PREFIX.search);
+      filters.search = unslugify(slug);
+      continue;
+    }
+
     if (segment.startsWith(PREFIX.location)) {
       const slug = stripPrefix(segment, PREFIX.location);
       const knownLocation = findLocationBySlug(slug);
 
-      filters.location = knownLocation ?? unslugify(slug);
+      filters.location = knownLocation ?? formatSearchLabel(unslugify(slug));
       continue;
     }
 
@@ -220,7 +234,12 @@ function getActiveAmenities(filters: CatalogFiltersValue): EquipmentKey[] {
 export function buildCatalogPath(filters: CatalogFiltersValue, page = 1) {
   const segments: string[] = [];
 
+  const search = filters.search.trim();
   const location = filters.location.trim();
+
+  if (search) {
+    segments.push(`${PREFIX.search}${slugify(search)}`);
+  }
 
   if (location) {
     segments.push(`${PREFIX.location}${slugify(location)}`);
@@ -268,6 +287,7 @@ export function buildCatalogApiParams(
     page,
     perPage,
 
+    search: filters.search.trim() || undefined,
     location: filters.location.trim() || undefined,
     form: filters.form || undefined,
     transmission: filters.transmission || undefined,
@@ -291,7 +311,16 @@ export function buildCatalogBreadcrumbs(
 
   let current: CatalogFiltersValue = cloneDefaultFilters();
 
+  const search = filters.search.trim();
   const location = filters.location.trim();
+
+  if (search) {
+    current = { ...current, search };
+    items.push({
+      label: `Search: ${search}`,
+      href: buildCatalogPath(current),
+    });
+  }
 
   if (location) {
     current = { ...current, location };

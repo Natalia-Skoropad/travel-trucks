@@ -11,6 +11,7 @@ function getActiveEquipment(filters: CatalogFiltersValue) {
 
 function normalizeFilters(filters: CatalogFiltersValue) {
   return {
+    search: filters.search.trim(),
     location: filters.location.trim(),
     form: filters.form || '',
     transmission: filters.transmission || '',

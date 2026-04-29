@@ -86,6 +86,7 @@ export function filtersFromSearchParams(
   });
 
   return {
+    search: '',
     location,
     form,
     engine,

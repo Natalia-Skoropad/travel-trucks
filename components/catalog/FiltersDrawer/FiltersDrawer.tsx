@@ -1,56 +1,101 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
-import CloseButton from '@/components/common/CloseButton/CloseButton';
+import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { X } from 'lucide-react';
+
 import css from './FiltersDrawer.module.css';
 
 //===========================================================================
 
 type Props = {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
+  onOpenFilters: (open: () => void) => void;
 };
 
 //===========================================================================
 
-function FiltersDrawer({ isOpen, onClose, children }: Props) {
-  const handleBackdropClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (e.target === e.currentTarget) onClose();
-    },
-    [onClose]
-  );
+function FiltersDrawer({ children, onOpenFilters }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const open = useCallback(() => {
+    setIsOpen(true);
+  }, []);
+
+  const close = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  useEffect(() => {
+    onOpenFilters(open);
+  }, [onOpenFilters, open]);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const timeoutId = window.setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 0);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.clearTimeout(timeoutId);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        close();
+      }
     };
 
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, onClose]);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, close]);
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className={css.backdrop}
-      onClick={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Filters"
-    >
-      <div className={css.panel} role="document">
-        <header className={css.header}>
-          <h2 className={css.title}>Filters</h2>
-          <CloseButton onClick={onClose} />
-        </header>
+    <div className={css.root}>
+      <button
+        type="button"
+        className={css.backdrop}
+        aria-label="Close filters"
+        onClick={close}
+      />
 
-        <div className={css.content}>{children}</div>
-      </div>
+      <aside
+        className={css.drawer}
+        aria-modal="true"
+        role="dialog"
+        aria-labelledby="filters-drawer-title"
+      >
+        <div className={css.header}>
+          <h2 id="filters-drawer-title" className={css.title}>
+            Filters
+          </h2>
+
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className={css.closeButton}
+            aria-label="Close filters"
+            onClick={close}
+          >
+            <X size={24} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className={css.body}>{children}</div>
+      </aside>
     </div>
   );
 }

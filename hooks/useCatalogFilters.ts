@@ -33,16 +33,20 @@ export function useCatalogFilters(
   const [page, setPageState] = useState(initialPage);
   const [isPending, startTransition] = useTransition();
 
+  const debouncedSearch = useDebouncedValue(filters.search, 450);
+  const effectiveSearch = filters.search.trim() ? debouncedSearch : '';
+
   const debouncedLocation = useDebouncedValue(filters.location, 450);
   const effectiveLocation = filters.location.trim() ? debouncedLocation : '';
 
   const effectiveFilters = useMemo<CatalogFiltersValue>(
     () => ({
       ...filters,
+      search: effectiveSearch,
       location: effectiveLocation,
       equipment: { ...filters.equipment },
     }),
-    [filters, effectiveLocation]
+    [filters, effectiveSearch, effectiveLocation]
   );
 
   const lastHrefRef = useRef(buildCatalogPath(effectiveFilters, page));
@@ -60,6 +64,7 @@ export function useCatalogFilters(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     page,
+    effectiveFilters.search,
     effectiveFilters.location,
     effectiveFilters.form,
     effectiveFilters.engine,

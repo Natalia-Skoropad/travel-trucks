@@ -1,13 +1,7 @@
-.toolbar {
-  margin-top: 24px;
-}
-
 .layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
-
-  padding-bottom: 24px;
+  gap: 32px;
 }
 
 .sidebar {
@@ -18,46 +12,65 @@
   min-width: 0;
 }
 
-.desktopActions {
+.catalogTop {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sortDesktop {
   display: none;
-  margin: 12px 0 16px;
-  justify-content: flex-end;
-
-  min-height: 56px;
-  visibility: hidden;
 }
 
-.desktopActions.visible {
-  visibility: visible;
+.mobileSearchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin-top: 16px;
 }
 
-.filterBtn {
-  margin-right: 10px;
+.mobileSearch {
+  min-width: 0;
+}
+
+.mobileFilterButton {
+  min-width: 112px;
+  height: 48px;
+}
+
+.listWrap {
+  margin-top: 24px;
 }
 
 @media only screen and (min-width: 768px) {
-  .toolbar {
-    min-width: 180px;
+  .mobileSearchRow {
+    gap: 16px;
   }
 }
 
 @media only screen and (min-width: 1440px) {
-  .toolbar {
-    display: none;
-  }
-
-  .desktopActions {
-    display: flex;
-  }
-
   .layout {
-    grid-template-columns: 405px 1fr;
+    grid-template-columns: 360px minmax(0, 1fr);
     align-items: start;
   }
 
   .sidebar {
     display: block;
-    position: sticky;
-    top: 24px;
+  }
+
+  .catalogTop {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .sortDesktop {
+    display: block;
+    width: 260px;
+  }
+
+  .mobileSearchRow {
+    display: none;
   }
 }

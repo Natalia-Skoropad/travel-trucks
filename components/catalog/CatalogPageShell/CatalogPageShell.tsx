@@ -1,43 +1,40 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 import FiltersDrawer from '@/components/catalog/FiltersDrawer/FiltersDrawer';
+
 import css from './CatalogPageShell.module.css';
 
 //===========================================================================
 
 type Props = {
-  children: React.ReactNode;
-  filters: React.ReactNode;
-
-  onOpenFilters?: (open: () => void) => void;
+  children: ReactNode;
+  desktopFilters: ReactNode;
+  drawerFilters: ReactNode;
+  onOpenFilters: (open: () => void) => void;
 };
 
 //===========================================================================
 
-function CatalogPageShell({ children, filters, onOpenFilters }: Props) {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  const open = () => setIsDrawerOpen(true);
-  const close = () => setIsDrawerOpen(false);
-
-  useEffect(() => {
-    onOpenFilters?.(open);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+function CatalogPageShell({
+  children,
+  desktopFilters,
+  drawerFilters,
+  onOpenFilters,
+}: Props) {
   return (
-    <>
-      <div className={css.layout}>
-        <aside className={css.sidebar}>{filters}</aside>
-        <section className={css.content}>{children}</section>
-      </div>
+    <div className={css.layout}>
+      <aside className={css.sidebar}>{desktopFilters}</aside>
 
-      <FiltersDrawer isOpen={isDrawerOpen} onClose={close}>
-        {filters}
-      </FiltersDrawer>
-    </>
+      <section className={css.content}>
+        <FiltersDrawer onOpenFilters={onOpenFilters}>
+          {drawerFilters}
+        </FiltersDrawer>
+
+        {children}
+      </section>
+    </div>
   );
 }
 
