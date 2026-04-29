@@ -21,10 +21,16 @@ import {
   isCatalogDetailsPath,
   parseCatalogSegments,
 } from '@/lib/utils/catalogSegments';
-import { filtersToTitle } from '@/lib/utils/catalogUrl';
+
+import { buildCatalogMetadata } from '@/lib/seo/catalogSeo';
+import {
+  buildCamperMetadata,
+  buildCamperNotFoundMetadata,
+} from '@/lib/seo/camperSeo';
 
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
 import CatalogPageClient from '../CatalogPageClient';
+import CatalogSeoText from '@/components/catalog/CatalogSeoText/CatalogSeoText';
 
 import CamperHero from '@/components/details/CamperHero/CamperHero';
 import CamperDetailsBottom from '@/components/details/CamperDetailsBottom/CamperDetailsBottom';
@@ -41,81 +47,28 @@ type PageProps = {
 
 //===========================================================================
 
-const SITE_URL = 'https://travel-trucks-five-liart.vercel.app';
-
-//===========================================================================
-
-async function generateCatalogMetadata(segments?: string[]): Promise<Metadata> {
+async function generateCatalogPageMetadata(
+  segments?: string[]
+): Promise<Metadata> {
   const { filters, page } = parseCatalogSegments(segments);
-  const titleSuffix = filtersToTitle(filters);
 
-  return {
-    title:
-      page > 1
-        ? `Catalog — ${titleSuffix} — Page ${page}`
-        : `Catalog — ${titleSuffix}`,
-    description: `Browse campers: ${titleSuffix}. Find a camper for your next trip with TravelTrucks.`,
-  };
+  return buildCatalogMetadata({
+    filters,
+    page,
+  });
 }
 
-async function generateCamperMetadata(id: string): Promise<Metadata> {
+async function generateCamperPageMetadata(id: string): Promise<Metadata> {
   try {
     const camper = await fetchCamperByIdFromServer(id);
 
-    const title = camper.name;
-
-    const baseDescription =
-      camper.description?.trim() ||
-      'Explore camper features, read reviews, and book your next trip with TravelTrucks.';
-
-    const locationPart = camper.location
-      ? ` Location: ${camper.location}.`
-      : '';
-
-    const description = `${baseDescription}${locationPart}`;
-    const canonicalUrl = `${SITE_URL}/catalog/${id}`;
-
-    const ogImage =
-      camper.gallery?.[0]?.original ||
-      camper.coverImage ||
-      '/background-picture.jpg';
-
-    return {
-      title,
-      description,
-      alternates: {
-        canonical: canonicalUrl,
-      },
-      openGraph: {
-        title,
-        description,
-        url: canonicalUrl,
-        siteName: 'TravelTrucks',
-        images: [
-          {
-            url: ogImage,
-            width: 1200,
-            height: 630,
-            alt: camper.name || 'TravelTrucks camper',
-          },
-        ],
-        type: 'website',
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [ogImage],
-      },
-    };
+    return buildCamperMetadata(camper);
   } catch {
-    return {
-      title: 'Camper not found',
-      description:
-        'The camper you are looking for was not found on TravelTrucks.',
-    };
+    return buildCamperNotFoundMetadata();
   }
 }
+
+//===========================================================================
 
 export async function generateMetadata({
   params,
@@ -123,10 +76,10 @@ export async function generateMetadata({
   const { segments } = await params;
 
   if (isCatalogDetailsPath(segments)) {
-    return generateCamperMetadata(segments![0]);
+    return generateCamperPageMetadata(segments![0]);
   }
 
-  return generateCatalogMetadata(segments);
+  return generateCatalogPageMetadata(segments);
 }
 
 //===========================================================================
@@ -136,7 +89,7 @@ async function CatalogListPage({ segments }: { segments?: string[] }) {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchInfiniteQuery({
+  const initialData = await queryClient.fetchInfiniteQuery({
     queryKey: campersQueryKeys.list(filters, CATALOG_PER_PAGE),
     queryFn: ({ pageParam }) =>
       fetchCampersFromServer(
@@ -147,6 +100,9 @@ async function CatalogListPage({ segments }: { segments?: string[] }) {
       lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
   });
 
+  const firstPage = initialData.pages[0];
+  const hasCampers = Boolean(firstPage?.campers.length);
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <main>
@@ -154,6 +110,10 @@ async function CatalogListPage({ segments }: { segments?: string[] }) {
           <Breadcrumbs items={buildCatalogBreadcrumbs(filters, page)} />
 
           <CatalogPageClient initialFilters={filters} />
+
+          {page === 1 && hasCampers ? (
+            <CatalogSeoText filters={filters} />
+          ) : null}
         </div>
       </main>
     </HydrationBoundary>
@@ -169,11 +129,11 @@ async function CamperDetailsPage({ id }: { id: string }) {
   try {
     [camper, reviews] = await Promise.all([
       queryClient.fetchQuery({
-        queryKey: ['camper', id],
+        queryKey: campersQueryKeys.detail(id),
         queryFn: () => fetchCamperByIdFromServer(id),
       }),
       queryClient.fetchQuery({
-        queryKey: ['camper-reviews', id],
+        queryKey: campersQueryKeys.reviews(id),
         queryFn: () => fetchCamperReviewsFromServer(id),
       }),
     ]);
