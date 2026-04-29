@@ -1,26 +1,25 @@
-import type { Camper } from '@/types/camper';
+import type { Review } from '@/types/review';
 
 import SvgIcon from '@/components/common/SvgIcon/SvgIcon';
 import css from './ReviewsList.module.css';
 
 //===========================================================================
 
-type Review = Camper['reviews'][number];
-
 type Props = {
-  reviews?: Camper['reviews'];
+  reviews?: Review[];
   className?: string;
 };
 
 //===========================================================================
 
-function clampRating(n: number) {
-  return Math.min(5, Math.max(0, Math.round(n)));
+function clampRating(value: number) {
+  return Math.min(5, Math.max(0, Math.round(value)));
 }
 
 function getInitial(name: string) {
-  const s = name.trim();
-  return s ? s[0].toUpperCase() : '?';
+  const value = name.trim();
+
+  return value ? value[0].toUpperCase() : '?';
 }
 
 //===========================================================================
@@ -43,14 +42,14 @@ function ReviewCard({ review }: { review: Review }) {
             role="img"
             aria-label={`Rating: ${stars} out of 5`}
           >
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, index) => (
               <SvgIcon
-                key={i}
+                key={index}
                 name="icon-star"
                 size={16}
                 aria-hidden="true"
                 className={`${css.star} ${
-                  i < stars ? css.starOn : css.starOff
+                  index < stars ? css.starOn : css.starOff
                 }`}
               />
             ))}
@@ -76,11 +75,8 @@ function ReviewsList({ reviews, className }: Props) {
         <p className={css.empty}>No reviews yet.</p>
       ) : (
         <ul className={css.list}>
-          {list.map((r, idx) => (
-            <ReviewCard
-              key={`${r.reviewer_name}-${r.reviewer_rating}-${idx}`}
-              review={r}
-            />
+          {list.map((review) => (
+            <ReviewCard key={review.id} review={review} />
           ))}
         </ul>
       )}

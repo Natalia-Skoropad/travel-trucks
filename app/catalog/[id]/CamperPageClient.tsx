@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import FavoriteButton from '@/components/common/FavoriteButton/FavoriteButton';
 import Toast from '@/components/common/Toast/Toast';
-import { useCatalogStore } from '@/lib/store/catalogStore';
+import { useFavorites } from '@/hooks/useFavorites';
 
 import css from './page.module.css';
 
@@ -18,32 +18,32 @@ type Props = {
 //===============================================================
 
 function CamperPageClient({ camperId, title }: Props) {
-  const favorites = useCatalogStore((s) => s.favorites);
-  const toggleFavorite = useCatalogStore((s) => s.toggleFavorite);
+  const { favoriteIds, toggleFavorite } = useFavorites();
 
-  const isFav = favorites.includes(camperId);
+  const isFavorite = favoriteIds.includes(camperId);
 
   const [toastMsg, setToastMsg] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
   const handleToggle = () => {
-    const willBeFav = !isFav;
+    const willBeFavorite = !isFavorite;
 
     toggleFavorite(camperId);
 
-    if (willBeFav) {
-      setToastType('success');
-      setToastMsg('Camper added to your favorites.');
-    } else {
-      setToastType('success');
-      setToastMsg('Camper removed from your favorites.');
-    }
+    setToastType('success');
+    setToastMsg(
+      willBeFavorite
+        ? 'Camper added to your favorites.'
+        : 'Camper removed from your favorites.'
+    );
   };
 
   useEffect(() => {
     if (!toastMsg) return;
-    const id = window.setTimeout(() => setToastMsg(''), 2500);
-    return () => window.clearTimeout(id);
+
+    const timeoutId = window.setTimeout(() => setToastMsg(''), 2500);
+
+    return () => window.clearTimeout(timeoutId);
   }, [toastMsg]);
 
   return (
@@ -52,7 +52,7 @@ function CamperPageClient({ camperId, title }: Props) {
         <h1 className={css.title}>{title}</h1>
 
         <FavoriteButton
-          isActive={isFav}
+          isActive={isFavorite}
           onToggle={handleToggle}
           className={css.favDesktop}
           size="lg"

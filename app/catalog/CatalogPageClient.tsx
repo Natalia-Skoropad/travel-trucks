@@ -1,18 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Filter } from 'lucide-react';
 
-import type { Camper } from '@/types/camper';
+import type { CamperListItem } from '@/types/camper';
 import { fetchCamperById } from '@/lib/api/campersApi';
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
-import { DEFAULT_CATALOG_FILTERS } from '@/lib/constants/catalogDefaults';
-import { useCatalogStore } from '@/lib/store/catalogStore';
-import { filtersToSearchParams } from '@/lib/utils/catalogUrl';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-
 import { LOCATIONS } from '@/lib/constants/locations';
+
+import { useCatalogCampers } from '@/hooks/useCatalogCampers';
+import { useCatalogFilters } from '@/hooks/useCatalogFilters';
+import { useFavorites } from '@/hooks/useFavorites';
 
 import CatalogFilters from '@/components/catalog/CatalogFilters/CatalogFilters';
 import CatalogPageShell from '@/components/catalog/CatalogPageShell/CatalogPageShell';
@@ -25,24 +23,10 @@ import css from '@/components/catalog/CatalogPageShell/CatalogPageShell.module.c
 //===========================================================================
 
 type Props = {
-  initialItems: Camper[];
-  initialTotal: number;
   initialFilters: CatalogFiltersValue;
 };
 
 type TabValue = 'all' | 'favorites';
-
-//===========================================================================
-
-function isFiltersApplied(v: CatalogFiltersValue) {
-  const hasLocation = Boolean(v.location.trim());
-  const hasForm = Boolean(v.form);
-  const hasEngine = Boolean(v.engine);
-  const hasTransmission = Boolean(v.transmission);
-  const hasEquipment = Object.values(v.equipment).some(Boolean);
-
-  return hasLocation || hasForm || hasEngine || hasTransmission || hasEquipment;
-}
 
 //===========================================================================
 
@@ -52,112 +36,35 @@ function uniqSorted(list: string[]) {
 
 //===========================================================================
 
-function CatalogPageClient({
-  initialItems,
-  initialTotal,
-  initialFilters,
-}: Props) {
-  const router = useRouter();
-
-  const items = useCatalogStore((s) => s.items);
-  const total = useCatalogStore((s) => s.total);
-  const hasMore = items.length < total;
-
-  const loadMore = useCatalogStore((s) => s.loadMore);
+function CatalogPageClient({ initialFilters }: Props) {
   const openFiltersRef = useRef<(() => void) | null>(null);
 
-  //===========================================================================
+  const {
+    filters,
+    effectiveFilters,
+    setFilters,
+    resetFilters,
+    filtersApplied,
+    isPending,
+  } = useCatalogFilters(initialFilters);
 
-  const didInitRef = useRef(false);
-  const lastHrefRef = useRef<string>('');
-  const init = useCatalogStore((s) => s.init);
+  const {
+    campers,
+    total,
+    isLoading,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useCatalogCampers(effectiveFilters);
 
-  useEffect(() => {
-    init({
-      items: initialItems,
-      total: initialTotal,
-      filters: initialFilters ?? DEFAULT_CATALOG_FILTERS,
-    });
+  const { favoriteIds, favoritesCount } = useFavorites();
 
-    didInitRef.current = true;
-  }, [init, initialItems, initialTotal, initialFilters]);
-
-  //===========================================================================
-
-  const filters = useCatalogStore((s) => s.filters);
-  const debouncedLocation = useDebouncedValue(filters.location, 450);
-  const effectiveLocation = filters.location.trim() ? debouncedLocation : '';
-
-  const effectiveFilters: CatalogFiltersValue = useMemo(
-    () => ({
-      ...filters,
-      location: effectiveLocation,
-      equipment: { ...filters.equipment },
-    }),
-    [filters, effectiveLocation]
-  );
-
-  //===========================================================================
-
-  const hasHydrated = useCatalogStore((s) => s.hasHydrated);
-  const search = useCatalogStore((s) => s.search);
-  const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    if (!didInitRef.current) return;
-    if (!hasHydrated) return;
-
-    const qs = filtersToSearchParams(effectiveFilters).toString();
-    const href = qs ? `/catalog?${qs}` : '/catalog';
-
-    if (href === lastHrefRef.current) return;
-    lastHrefRef.current = href;
-
-    startTransition(async () => {
-      router.replace(href, { scroll: false });
-      await search();
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    hasHydrated,
-    effectiveFilters.location,
-    effectiveFilters.form,
-    effectiveFilters.engine,
-    effectiveFilters.transmission,
-    JSON.stringify(effectiveFilters.equipment),
-  ]);
-
-  //===========================================================================
-
-  const setFilters = useCatalogStore((s) => s.setFilters);
-  const handleFiltersChange = (next: CatalogFiltersValue) => {
-    const safeNext: CatalogFiltersValue = {
-      ...next,
-      equipment: { ...next.equipment },
-    };
-
-    setFilters(safeNext);
-  };
-
-  //===========================================================================
-
-  const resetFilters = useCatalogStore((s) => s.resetFilters);
-
-  const reset = () => {
-    startTransition(async () => {
-      resetFilters();
-      lastHrefRef.current = ''; // allow url to update after reset
-      router.replace('/catalog', { scroll: false });
-      await search();
-    });
-  };
-
-  //===========================================================================
-
-  const [favoriteItems, setFavoriteItems] = useState<Camper[]>([]);
-  const [isFavLoading, setIsFavLoading] = useState(false);
-  const favorites = useCatalogStore((s) => s.favorites);
   const [tab, setTab] = useState<TabValue>('all');
+  const [favoriteItems, setFavoriteItems] = useState<CamperListItem[]>([]);
+  const [isFavLoading, setIsFavLoading] = useState(false);
+
+  //===========================================================================
 
   useEffect(() => {
     let cancelled = false;
@@ -165,7 +72,7 @@ function CatalogPageClient({
     async function loadFavorites() {
       if (tab !== 'favorites') return;
 
-      if (!favorites.length) {
+      if (!favoriteIds.length) {
         setFavoriteItems([]);
         return;
       }
@@ -174,7 +81,7 @@ function CatalogPageClient({
 
       try {
         const results = await Promise.all(
-          favorites.map(async (id) => {
+          favoriteIds.map(async (id) => {
             try {
               return await fetchCamperById(id);
             } catch {
@@ -183,54 +90,62 @@ function CatalogPageClient({
           })
         );
 
-        const clean = results.filter((x): x is Camper => x !== null);
-        if (!cancelled) setFavoriteItems(clean);
+        const clean = results.filter((item) => item !== null);
+
+        if (!cancelled) {
+          setFavoriteItems(clean);
+        }
       } finally {
-        if (!cancelled) setIsFavLoading(false);
+        if (!cancelled) {
+          setIsFavLoading(false);
+        }
       }
     }
 
     void loadFavorites();
+
     return () => {
       cancelled = true;
     };
-  }, [tab, favorites]);
-
-  const visibleItems = tab === 'favorites' ? favoriteItems : items;
-
-  const favoritesCount =
-    tab === 'favorites'
-      ? isFavLoading
-        ? favorites.length
-        : favoriteItems.length
-      : favorites.length;
-
-  const tabs = [
-    { value: 'all' as const, label: 'All', count: total },
-    { value: 'favorites' as const, label: 'Favorites', count: favoritesCount },
-  ];
+  }, [tab, favoriteIds]);
 
   //===========================================================================
 
+  const visibleItems = tab === 'favorites' ? favoriteItems : campers;
+
+  const tabs = [
+    { value: 'all' as const, label: 'All', count: total },
+    {
+      value: 'favorites' as const,
+      label: 'Favorites',
+      count:
+        tab === 'favorites' && !isFavLoading
+          ? favoriteItems.length
+          : favoritesCount,
+    },
+  ];
+
   const locationSuggestions = useMemo(() => {
     const fromCards = uniqSorted(
-      items.map((c) => (c.location ?? '').trim()).filter((x) => x.length > 0)
+      campers
+        .map((camper) => (camper.location ?? '').trim())
+        .filter((location) => location.length > 0)
     );
 
     const allowed = new Set<string>(LOCATIONS as readonly string[]);
-    return fromCards.filter((x) => allowed.has(x));
-  }, [items]);
 
-  const filtersApplied = isFiltersApplied(filters);
-  const isLoading = useCatalogStore((s) => s.isLoading);
+    return fromCards.filter((location) => allowed.has(location));
+  }, [campers]);
+
+  const isCatalogBusy = isPending || isFetching;
 
   const filtersUI = (
     <CatalogFilters
       value={filters}
-      onChange={handleFiltersChange}
-      onReset={reset}
-      isResetDisabled={!filtersApplied || isPending || isLoading}
-      isFiltering={isPending || isLoading}
+      onChange={setFilters}
+      onReset={resetFilters}
+      isResetDisabled={!filtersApplied || isCatalogBusy}
+      isFiltering={isCatalogBusy}
       locationSuggestions={locationSuggestions}
     />
   );
@@ -252,7 +167,7 @@ function CatalogPageClient({
         renderPanel={() => <span aria-hidden="true" />}
       />
 
-      <div className={css.toolbar} style={{ justifyContent: 'flex-end' }}>
+      <div className={css.toolbar}>
         <Button
           variant="filter"
           iconLeft={<Filter className={css.filterBtn} />}
@@ -266,7 +181,7 @@ function CatalogPageClient({
         You can find everything you want in our catalog
       </h1>
 
-      <div style={{ marginTop: 24 }}>
+      <div className={css.listWrap}>
         <CampersList
           campers={visibleItems}
           isLoading={
@@ -280,19 +195,17 @@ function CatalogPageClient({
         />
       </div>
 
-      {tab === 'all' && hasMore && (
-        <div
-          style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}
-        >
+      {tab === 'all' && hasNextPage ? (
+        <div className={css.loadMoreWrap}>
           <Button
-            onClick={() => startTransition(() => loadMore())}
-            disabled={isPending || isLoading}
+            onClick={() => void fetchNextPage()}
+            disabled={isCatalogBusy || isFetchingNextPage}
             variant="outlineRed"
           >
-            {isPending || isLoading ? 'Loading…' : 'Load more'}
+            {isFetchingNextPage ? 'Loading…' : 'Load more'}
           </Button>
         </div>
-      )}
+      ) : null}
     </CatalogPageShell>
   );
 }

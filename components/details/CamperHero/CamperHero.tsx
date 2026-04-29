@@ -1,6 +1,6 @@
-import type { Camper } from '@/types/camper';
+import type { CamperDetails } from '@/types/camper';
 
-import RatingLocation from '../../common/RatingLocation/RatingLocation';
+import RatingLocation from '@/components/common/RatingLocation/RatingLocation';
 import Gallery from '@/components/details/Gallery/Gallery';
 
 import css from './CamperHero.module.css';
@@ -9,10 +9,10 @@ import css from './CamperHero.module.css';
 
 type Props = {
   camper: Pick<
-    Camper,
+    CamperDetails,
     | 'name'
     | 'rating'
-    | 'reviews'
+    | 'totalReviews'
     | 'location'
     | 'price'
     | 'gallery'
@@ -23,14 +23,16 @@ type Props = {
 //===========================================================================
 
 function CamperHero({ camper }: Props) {
-  const images = camper.gallery?.map((g) => g.original) ?? [];
+  const images = camper.gallery?.map((item) => item.original) ?? [];
+
   return (
     <section className={css.section}>
       <h2 className="visually-hidden">Vehicle information</h2>
+
       <div className={css.head}>
         <RatingLocation
           rating={camper.rating ?? 0}
-          reviewsCount={camper.reviews?.length ?? 0}
+          reviewsCount={camper.totalReviews ?? 0}
           location={camper.location ?? ''}
         />
 

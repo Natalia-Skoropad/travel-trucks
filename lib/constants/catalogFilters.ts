@@ -1,31 +1,80 @@
-import type { CampersQuery } from '@/lib/api/campersApi';
+import type {
+  CamperAmenity,
+  CamperEngine,
+  CamperForm,
+  CamperTransmission,
+} from '@/types/camper';
+
+//===========================================================================
+
+export type EquipmentKey = CamperAmenity;
+
+export type VehicleForm = CamperForm;
+export type VehicleTransmission = CamperTransmission;
+export type VehicleEngine = CamperEngine;
 
 //===========================================================================
 
 export type CatalogFiltersValue = {
   location: string;
-  form: VehicleForm | '';
+  form: CamperForm | '';
 
-  engine: VehicleEngine | '';
-  transmission: VehicleTransmission | '';
+  engine: CamperEngine | '';
+  transmission: CamperTransmission | '';
 
   equipment: Partial<Record<EquipmentKey, boolean>>;
 };
 
 //===========================================================================
 
-export type EquipmentKey = keyof Pick<
-  CampersQuery,
-  | 'AC'
-  | 'kitchen'
-  | 'bathroom'
-  | 'TV'
-  | 'radio'
-  | 'refrigerator'
-  | 'microwave'
-  | 'gas'
-  | 'water'
->;
+export const CAMPER_FORM_LABELS: Record<CamperForm, string> = {
+  alcove: 'Alcove',
+  panel_van: 'Panel van',
+  integrated: 'Integrated',
+  semi_integrated: 'Semi-integrated',
+};
+
+export const TRANSMISSION_LABELS: Record<CamperTransmission, string> = {
+  automatic: 'Automatic',
+  manual: 'Manual',
+};
+
+export const ENGINE_LABELS: Record<CamperEngine, string> = {
+  diesel: 'Diesel',
+  petrol: 'Petrol',
+  hybrid: 'Hybrid',
+  electric: 'Electric',
+};
+
+export const AMENITY_LABELS: Record<CamperAmenity, string> = {
+  ac: 'AC',
+  bathroom: 'Bathroom',
+  kitchen: 'Kitchen',
+  tv: 'TV',
+  radio: 'Radio',
+  refrigerator: 'Refrigerator',
+  microwave: 'Microwave',
+  gas: 'Gas',
+  water: 'Water',
+};
+
+//===========================================================================
+
+export function formatCamperFormLabel(value: CamperForm) {
+  return CAMPER_FORM_LABELS[value];
+}
+
+export function formatTransmissionLabel(value: CamperTransmission) {
+  return TRANSMISSION_LABELS[value];
+}
+
+export function formatEngineLabel(value: CamperEngine) {
+  return ENGINE_LABELS[value];
+}
+
+export function formatAmenityLabel(value: CamperAmenity) {
+  return AMENITY_LABELS[value];
+}
 
 //===========================================================================
 
@@ -34,20 +83,26 @@ export const EQUIPMENT_OPTIONS: Array<{
   label: string;
   icon: string;
 }> = [
-  { key: 'AC', label: 'AC', icon: 'icon-wind' },
-  { key: 'bathroom', label: 'Bathroom', icon: 'icon-shower' },
-  { key: 'gas', label: 'Gas', icon: 'icon-gas' },
-  { key: 'kitchen', label: 'Kitchen', icon: 'icon-cup-hot' },
-  { key: 'radio', label: 'Radio', icon: 'icon-radios' },
-  { key: 'refrigerator', label: 'Refrigerator', icon: 'icon-fridge' },
-  { key: 'microwave', label: 'Microwave', icon: 'icon-microwave' },
-  { key: 'TV', label: 'TV', icon: 'icon-tv' },
-  { key: 'water', label: 'Water', icon: 'icon-water' },
+  { key: 'ac', label: AMENITY_LABELS.ac, icon: 'icon-wind' },
+  { key: 'bathroom', label: AMENITY_LABELS.bathroom, icon: 'icon-shower' },
+  { key: 'gas', label: AMENITY_LABELS.gas, icon: 'icon-gas-stove' },
+  { key: 'kitchen', label: AMENITY_LABELS.kitchen, icon: 'icon-cup-hot' },
+  { key: 'radio', label: AMENITY_LABELS.radio, icon: 'icon-radios' },
+  {
+    key: 'refrigerator',
+    label: AMENITY_LABELS.refrigerator,
+    icon: 'icon-fridge',
+  },
+  {
+    key: 'microwave',
+    label: AMENITY_LABELS.microwave,
+    icon: 'icon-microwave',
+  },
+  { key: 'tv', label: AMENITY_LABELS.tv, icon: 'icon-tv' },
+  { key: 'water', label: AMENITY_LABELS.water, icon: 'icon-water' },
 ];
 
 //===========================================================================
-
-export type VehicleForm = NonNullable<CampersQuery['form']>;
 
 export const VEHICLE_FORMS: Array<{
   value: VehicleForm;
@@ -55,47 +110,81 @@ export const VEHICLE_FORMS: Array<{
   icon: string;
 }> = [
   {
-    value: 'panelTruck',
-    label: 'Panel Truck',
+    value: 'panel_van',
+    label: CAMPER_FORM_LABELS.panel_van,
     icon: 'icon-grid-1x2',
   },
-
   {
-    value: 'fullyIntegrated',
-    label: 'Fully Integrated',
+    value: 'integrated',
+    label: CAMPER_FORM_LABELS.integrated,
     icon: 'icon-grid-2x2',
   },
-
+  {
+    value: 'semi_integrated',
+    label: CAMPER_FORM_LABELS.semi_integrated,
+    icon: 'icon-grid-2x2',
+  },
   {
     value: 'alcove',
-    label: 'Alcove',
+    label: CAMPER_FORM_LABELS.alcove,
     icon: 'icon-grid-3x3',
   },
 ];
 
 //===========================================================================
 
-export type VehicleTransmission = NonNullable<CampersQuery['transmission']>;
-
 export const TRANSMISSION_OPTIONS: Array<{
   value: VehicleTransmission;
   label: string;
   icon: string;
 }> = [
-  { value: 'automatic', label: 'Automatic', icon: 'icon-automatic' },
-  { value: 'manual', label: 'Manual', icon: 'icon-manual' },
+  {
+    value: 'automatic',
+    label: TRANSMISSION_LABELS.automatic,
+    icon: 'icon-fuel-pump',
+  },
+  {
+    value: 'manual',
+    label: TRANSMISSION_LABELS.manual,
+    icon: 'icon-fuel-pump',
+  },
 ];
 
 //===========================================================================
-
-export type VehicleEngine = NonNullable<CampersQuery['engine']>;
 
 export const ENGINE_OPTIONS: Array<{
   value: VehicleEngine;
   label: string;
   icon: string;
 }> = [
-  { value: 'petrol', label: 'Petrol', icon: 'icon-petrol' },
-  { value: 'diesel', label: 'Diesel', icon: 'icon-diesel' },
-  { value: 'hybrid', label: 'Hybrid', icon: 'icon-hybrid' },
+  {
+    value: 'diesel',
+    label: ENGINE_LABELS.diesel,
+    icon: 'icon-fuel-pump',
+  },
+  {
+    value: 'petrol',
+    label: ENGINE_LABELS.petrol,
+    icon: 'icon-fuel-pump',
+  },
+  {
+    value: 'hybrid',
+    label: ENGINE_LABELS.hybrid,
+    icon: 'icon-fuel-pump',
+  },
+  {
+    value: 'electric',
+    label: ENGINE_LABELS.electric,
+    icon: 'icon-fuel-pump',
+  },
 ];
+
+//===========================================================================
+
+export const CAMPER_FORM_VALUES = VEHICLE_FORMS.map((item) => item.value);
+export const TRANSMISSION_VALUES = TRANSMISSION_OPTIONS.map(
+  (item) => item.value
+);
+
+export const ENGINE_VALUES = ENGINE_OPTIONS.map((item) => item.value);
+export const AMENITY_VALUES = EQUIPMENT_OPTIONS.map((item) => item.key);

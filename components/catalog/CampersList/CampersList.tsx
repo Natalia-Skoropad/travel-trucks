@@ -1,4 +1,5 @@
-import type { Camper } from '@/types/camper';
+import type { CamperListItem } from '@/types/camper';
+
 import CamperCard from '@/components/catalog/CamperCard/CamperCard';
 import InlineLoader from '@/components/common/InlineLoader/InlineLoader';
 
@@ -7,7 +8,7 @@ import css from './CampersList.module.css';
 //===============================================================
 
 type Props = {
-  campers: Camper[];
+  campers: CamperListItem[];
   isLoading?: boolean;
   className?: string;
   emptyText?: string;

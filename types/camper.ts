@@ -1,55 +1,63 @@
-import type {
-  VehicleForm,
-  VehicleEngine,
-  VehicleTransmission,
-} from '@/lib/constants/catalogFilters';
+export type CamperForm =
+  | 'alcove'
+  | 'panel_van'
+  | 'integrated'
+  | 'semi_integrated';
 
-//===========================================================================
+export type CamperTransmission = 'automatic' | 'manual';
+
+export type CamperEngine = 'diesel' | 'petrol' | 'hybrid' | 'electric';
+
+export type CamperAmenity =
+  | 'ac'
+  | 'bathroom'
+  | 'kitchen'
+  | 'tv'
+  | 'radio'
+  | 'refrigerator'
+  | 'microwave'
+  | 'gas'
+  | 'water';
+
+//===============================================================
 
 export type CamperGalleryItem = {
+  id: string;
+  camperId: string;
   thumb: string;
   original: string;
+  order: number;
 };
 
-export type Camper = {
+//===============================================================
+
+export type CamperListItem = {
   id: string;
   name: string;
   price: number;
   rating: number;
-
-  reviews: Array<{
-    reviewer_name: string;
-    reviewer_rating: number;
-    comment: string;
-  }>;
-
   location: string;
-  description: string;
-  gallery: CamperGalleryItem[];
 
-  transmission: VehicleTransmission;
-  engine: VehicleEngine;
-  form: VehicleForm;
-  AC: boolean;
-  bathroom: boolean;
-  kitchen: boolean;
-  TV: boolean;
-  radio: boolean;
-  refrigerator: boolean;
-  microwave?: boolean;
-  gas?: boolean;
-  water?: boolean;
-
+  form: CamperForm;
   length: string;
   width: string;
   height: string;
   tank: string;
   consumption: string;
+
+  transmission: CamperTransmission;
+  engine: CamperEngine;
+  amenities: CamperAmenity[];
+
+  coverImage: string;
+  totalReviews: number;
 };
 
-//===========================================================================
+//===============================================================
 
-export type CampersResponse = {
-  items: Camper[];
-  total: number;
+export type CamperDetails = CamperListItem & {
+  description: string;
+  gallery: CamperGalleryItem[];
+  createdAt: string;
+  updatedAt: string;
 };

@@ -1,7 +1,9 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { Camper } from '@/types/camper';
+
+import type { CamperDetails } from '@/types/camper';
+import type { Review } from '@/types/review';
 
 import Tabs from '@/components/common/Tabs/Tabs';
 import CamperSpecs from '@/components/details/CamperSpecs/CamperSpecs';
@@ -15,15 +17,18 @@ import css from './CamperDetailsBottom.module.css';
 type DetailsTab = 'features' | 'reviews';
 
 type Props = {
-  camper: Camper;
+  camper: CamperDetails;
+  reviews: Review[];
   className?: string;
 };
 
 //===============================================================
 
-function CamperDetailsBottom({ camper, className }: Props) {
+function CamperDetailsBottom({ camper, reviews, className }: Props) {
   const [tab, setTab] = useState<DetailsTab>('features');
-  const reviewsCount = camper.reviews?.length ?? 0;
+
+  const reviewsCount =
+    reviews.length > 0 ? reviews.length : camper.totalReviews;
 
   const items = useMemo(
     () => [
@@ -42,12 +47,12 @@ function CamperDetailsBottom({ camper, className }: Props) {
             items={items}
             value={tab}
             onChange={setTab}
-            renderPanel={(v) => (
+            renderPanel={(value) => (
               <div className={css.panel}>
-                {v === 'features' ? (
+                {value === 'features' ? (
                   <CamperSpecs camper={camper} />
                 ) : (
-                  <ReviewsList reviews={camper.reviews} />
+                  <ReviewsList reviews={reviews} />
                 )}
               </div>
             )}
@@ -55,7 +60,7 @@ function CamperDetailsBottom({ camper, className }: Props) {
         </div>
 
         <aside className={css.right}>
-          <BookingForm />
+          <BookingForm camperId={camper.id} />
         </aside>
       </div>
     </div>

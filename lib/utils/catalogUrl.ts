@@ -1,86 +1,97 @@
 import type {
   CatalogFiltersValue,
   EquipmentKey,
-  VehicleForm,
   VehicleEngine,
+  VehicleForm,
   VehicleTransmission,
 } from '@/lib/constants/catalogFilters';
 
-import { EQUIPMENT_OPTIONS } from '@/lib/constants/catalogFilters';
-
 import {
-  VEHICLE_FORMS,
-  ENGINE_OPTIONS,
-  TRANSMISSION_OPTIONS,
+  AMENITY_VALUES,
+  CAMPER_FORM_VALUES,
+  ENGINE_VALUES,
+  TRANSMISSION_VALUES,
+  formatAmenityLabel,
+  formatCamperFormLabel,
+  formatEngineLabel,
+  formatTransmissionLabel,
 } from '@/lib/constants/catalogFilters';
 
 //===========================================================================
 
-const EQUIPMENT_KEYS = EQUIPMENT_OPTIONS.map((x) => x.key);
-
-//===========================================================================
-
-function isVehicleForm(v: string): v is VehicleForm {
-  return VEHICLE_FORMS.some((t) => t.value === v);
+function isVehicleForm(value: string): value is VehicleForm {
+  return CAMPER_FORM_VALUES.includes(value as VehicleForm);
 }
 
-function isEngine(v: string): v is VehicleEngine {
-  return ENGINE_OPTIONS.some((x) => x.value === v);
+function isEngine(value: string): value is VehicleEngine {
+  return ENGINE_VALUES.includes(value as VehicleEngine);
 }
 
-function isTransmission(v: string): v is VehicleTransmission {
-  return TRANSMISSION_OPTIONS.some((x) => x.value === v);
+function isTransmission(value: string): value is VehicleTransmission {
+  return TRANSMISSION_VALUES.includes(value as VehicleTransmission);
+}
+
+function isEquipmentKey(value: string): value is EquipmentKey {
+  return AMENITY_VALUES.includes(value as EquipmentKey);
 }
 
 //===========================================================================
 
 export function filtersFromSearchParams(
-  sp: Record<string, string | string[] | undefined>
+  searchParams: Record<string, string | string[] | undefined>
 ): CatalogFiltersValue {
-  const location = typeof sp.location === 'string' ? sp.location : '';
+  const location =
+    typeof searchParams.location === 'string' ? searchParams.location : '';
 
-  const formRaw = sp.form;
+  const formRaw = searchParams.form;
   const formList = Array.isArray(formRaw)
     ? formRaw
     : typeof formRaw === 'string'
     ? [formRaw]
     : [];
-  const form = (formList.find(isVehicleForm) ?? '') as VehicleForm | '';
 
-  const engineRaw = sp.engine;
+  const form = formList.find(isVehicleForm) ?? '';
+
+  const engineRaw = searchParams.engine;
   const engineList = Array.isArray(engineRaw)
     ? engineRaw
     : typeof engineRaw === 'string'
     ? [engineRaw]
     : [];
-  const engine = (engineList.find(isEngine) ?? '') as VehicleEngine | '';
 
-  const trRaw = sp.transmission;
-  const trList = Array.isArray(trRaw)
-    ? trRaw
-    : typeof trRaw === 'string'
-    ? [trRaw]
+  const engine = engineList.find(isEngine) ?? '';
+
+  const transmissionRaw = searchParams.transmission;
+  const transmissionList = Array.isArray(transmissionRaw)
+    ? transmissionRaw
+    : typeof transmissionRaw === 'string'
+    ? [transmissionRaw]
     : [];
-  const transmission = (trList.find(isTransmission) ?? '') as
-    | VehicleTransmission
-    | '';
+
+  const transmission = transmissionList.find(isTransmission) ?? '';
 
   const equipment: Partial<Record<EquipmentKey, boolean>> = {};
 
-  for (const k of EQUIPMENT_KEYS) {
-    const v = sp[k];
-    const s = Array.isArray(v) ? v[0] : v;
-    if (s === '1' || s === 'true') equipment[k] = true;
-  }
+  const equipmentRaw = searchParams.equipment;
+  const equipmentList = Array.isArray(equipmentRaw)
+    ? equipmentRaw
+    : typeof equipmentRaw === 'string'
+    ? [equipmentRaw]
+    : [];
 
-  const eq = sp.equipment;
-  const eqList = Array.isArray(eq) ? eq : typeof eq === 'string' ? [eq] : [];
-  eqList.forEach((k) => {
-    if (EQUIPMENT_KEYS.includes(k as EquipmentKey))
-      equipment[k as EquipmentKey] = true;
+  equipmentList.forEach((key) => {
+    if (isEquipmentKey(key)) {
+      equipment[key] = true;
+    }
   });
 
-  return { location, form, engine, transmission, equipment };
+  return {
+    location,
+    form,
+    engine,
+    transmission,
+    equipment,
+  };
 }
 
 //===========================================================================
@@ -88,15 +99,19 @@ export function filtersFromSearchParams(
 export function filtersToSearchParams(filters: CatalogFiltersValue) {
   const params = new URLSearchParams();
 
-  const loc = filters.location.trim();
-  if (loc) params.set('location', loc);
+  const location = filters.location.trim();
 
+  if (location) params.set('location', location);
   if (filters.form) params.set('form', filters.form);
   if (filters.engine) params.set('engine', filters.engine);
-  if (filters.transmission) params.set('transmission', filters.transmission);
+  if (filters.transmission) {
+    params.set('transmission', filters.transmission);
+  }
 
-  (Object.keys(filters.equipment) as EquipmentKey[]).forEach((k) => {
-    if (filters.equipment[k]) params.set(k, '1');
+  (Object.keys(filters.equipment) as EquipmentKey[]).forEach((key) => {
+    if (filters.equipment[key]) {
+      params.append('equipment', key);
+    }
   });
 
   return params;
@@ -104,34 +119,34 @@ export function filtersToSearchParams(filters: CatalogFiltersValue) {
 
 //===========================================================================
 
-function formatFormLabel(v: string) {
-  return VEHICLE_FORMS.find((x) => x.value === v)?.label ?? v;
-}
-
-function formatEngineLabel(v: string) {
-  return ENGINE_OPTIONS.find((x) => x.value === v)?.label ?? v;
-}
-
-function formatTransmissionLabel(v: string) {
-  return TRANSMISSION_OPTIONS.find((x) => x.value === v)?.label ?? v;
-}
-
-//===========================================================================
-
 export function filtersToTitle(filters: CatalogFiltersValue) {
   const parts: string[] = [];
 
-  if (filters.form) parts.push(formatFormLabel(filters.form));
-  if (filters.transmission)
+  if (filters.form) {
+    parts.push(formatCamperFormLabel(filters.form));
+  }
+
+  if (filters.transmission) {
     parts.push(formatTransmissionLabel(filters.transmission));
-  if (filters.engine) parts.push(formatEngineLabel(filters.engine));
+  }
 
-  const eq = Object.entries(filters.equipment)
-    .filter(([, v]) => v)
-    .map(([k]) => k);
+  if (filters.engine) {
+    parts.push(formatEngineLabel(filters.engine));
+  }
 
-  if (eq.length) parts.push(eq.join(', '));
-  if (filters.location.trim()) parts.push(filters.location.trim());
+  const equipment = (Object.keys(filters.equipment) as EquipmentKey[])
+    .filter((key) => filters.equipment[key])
+    .map(formatAmenityLabel);
+
+  if (equipment.length) {
+    parts.push(equipment.join(', '));
+  }
+
+  const location = filters.location.trim();
+
+  if (location) {
+    parts.push(location);
+  }
 
   return parts.length ? parts.join(' • ') : 'All campers';
 }

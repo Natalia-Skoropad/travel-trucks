@@ -1,8 +1,7 @@
 import Link from 'next/link';
 
-import type { Camper } from '@/types/camper';
+import type { CamperDetails } from '@/types/camper';
 import { hrefByForm } from '@/lib/utils/catalogNav';
-import type { VehicleForm } from '@/lib/constants/catalogFilters';
 
 import {
   buildFeatureBadges,
@@ -10,6 +9,7 @@ import {
 } from '@/lib/utils/camperBadges';
 
 import FeatureBadges from '@/components/common/FeatureBadges/FeatureBadges';
+
 import css from './CamperSpecs.module.css';
 
 //===========================================================================
@@ -25,13 +25,14 @@ const DETAILS = [
 
 //===========================================================================
 
-function CamperSpecs({
-  camper,
-  className,
-}: {
-  camper: Camper;
+type Props = {
+  camper: CamperDetails;
   className?: string;
-}) {
+};
+
+//===========================================================================
+
+function CamperSpecs({ camper, className }: Props) {
   const badges = buildFeatureBadges(camper);
 
   return (
@@ -49,11 +50,8 @@ function CamperSpecs({
             <dt className={css.dt}>{label}</dt>
 
             <dd className={css.dd}>
-              {key === 'form' && camper.form ? (
-                <Link
-                  href={hrefByForm(camper.form as VehicleForm)}
-                  className={css.formLink}
-                >
+              {key === 'form' ? (
+                <Link href={hrefByForm(camper.form)} className={css.formLink}>
                   {formatVehicleForm(camper.form)}
                 </Link>
               ) : (

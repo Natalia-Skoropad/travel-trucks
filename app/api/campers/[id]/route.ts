@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import { api, type ApiError } from '../../api';
+
+import { campersServerApi } from '@/lib/api/api';
 
 //===========================================================================
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{
+    id: string;
+  }>;
 };
 
 //===========================================================================
@@ -14,15 +17,22 @@ export async function GET(_: Request, { params }: Props) {
   const { id } = await params;
 
   try {
-    const { data } = await api.get(`/campers/${id}`);
+    const { data } = await campersServerApi.get(
+      `/campers/${encodeURIComponent(id)}`
+    );
+
     return NextResponse.json(data);
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      const err = e as ApiError;
-      const status = err.response?.status ?? 500;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status ?? 500;
 
       return NextResponse.json(
-        { error: err.response?.data?.error || err.message },
+        {
+          error:
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            error.message,
+        },
         { status }
       );
     }

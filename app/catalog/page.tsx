@@ -5,9 +5,12 @@ import {
 } from '@tanstack/react-query';
 
 import type { Metadata } from 'next';
-import { fetchCampers } from '@/lib/api/campersApi';
-import { CATALOG_LIMIT } from '@/lib/constants/pagination';
-import type { CampersResponse } from '@/types/camper';
+
+import { fetchCampersFromServer } from '@/lib/api/campersApi';
+import { CATALOG_PER_PAGE } from '@/lib/constants/pagination';
+import { campersQueryKeys } from '@/lib/queryKeys/campersQueryKeys';
+import { buildCampersQuery } from '@/lib/utils/catalogQuery';
+import type { CampersResponse } from '@/types/catalog';
 
 import {
   filtersFromSearchParams,
@@ -36,7 +39,7 @@ export async function generateMetadata({
 
   return {
     title: `Catalog — ${titleSuffix}`,
-    description: `Browse campers: ${titleSuffix}`,
+    description: `Browse campers: ${titleSuffix}. Find a camper for your next trip with TravelTrucks.`,
   };
 }
 
@@ -46,37 +49,18 @@ async function CatalogPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const filters = filtersFromSearchParams(sp);
 
-  const params = {
-    page: 1,
-    limit: CATALOG_LIMIT,
-
-    location: filters.location.trim() || undefined,
-    form: filters.form || undefined,
-
-    engine: filters.engine || undefined,
-    transmission: filters.transmission || undefined,
-
-    ...Object.fromEntries(
-      Object.entries(filters.equipment)
-        .filter(([, v]) => v)
-        .map(([k]) => [k, true])
-    ),
-  };
-
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ['campers', params],
-    queryFn: () => fetchCampers(params),
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: campersQueryKeys.list(filters, CATALOG_PER_PAGE),
+    queryFn: ({ pageParam }) =>
+      fetchCampersFromServer(
+        buildCampersQuery(filters, Number(pageParam), CATALOG_PER_PAGE)
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: CampersResponse) =>
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
   });
-
-  const data = queryClient.getQueryData<CampersResponse>([
-    'campers',
-    params,
-  ]) ?? {
-    items: [],
-    total: 0,
-  };
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -86,11 +70,7 @@ async function CatalogPage({ searchParams }: PageProps) {
             items={[{ label: 'Home', href: '/' }, { label: 'Catalog' }]}
           />
 
-          <CatalogPageClient
-            initialItems={data.items}
-            initialTotal={data.total}
-            initialFilters={filters}
-          />
+          <CatalogPageClient initialFilters={filters} />
         </div>
       </main>
     </HydrationBoundary>

@@ -5,7 +5,12 @@ import {
 } from '@tanstack/react-query';
 
 import type { Metadata } from 'next';
-import { fetchCamperById } from '@/lib/api/campersApi';
+import { notFound } from 'next/navigation';
+
+import {
+  fetchCamperByIdFromServer,
+  fetchCamperReviewsFromServer,
+} from '@/lib/api/campersApi';
 
 import CamperHero from '@/components/details/CamperHero/CamperHero';
 import CamperDetailsBottom from '@/components/details/CamperDetailsBottom/CamperDetailsBottom';
@@ -24,48 +29,69 @@ type PageProps = {
 
 const SITE_URL = 'https://travel-trucks-five-liart.vercel.app';
 
+//===============================================================
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const camper = await fetchCamperById(id);
-  const title = camper.name;
 
-  const locationPart = camper.location ? ` Location: ${camper.location}.` : '';
-  const baseDesc =
-    camper.description?.trim() ||
-    'Explore camper features, read reviews, and book your next trip with TravelTrucks.';
+  try {
+    const camper = await fetchCamperByIdFromServer(id);
 
-  const description = `${baseDesc}${locationPart}`;
-  const canonicalUrl = `${SITE_URL}/catalog/${id}`;
-  const ogImage = camper.gallery?.[0]?.original || '/background-picture.jpg';
+    const title = camper.name;
 
-  return {
-    title,
-    description,
-    alternates: { canonical: canonicalUrl },
-    openGraph: {
+    const baseDescription =
+      camper.description?.trim() ||
+      'Explore camper features, read reviews, and book your next trip with TravelTrucks.';
+
+    const locationPart = camper.location
+      ? ` Location: ${camper.location}.`
+      : '';
+
+    const description = `${baseDescription}${locationPart}`;
+    const canonicalUrl = `${SITE_URL}/catalog/${id}`;
+
+    const ogImage =
+      camper.gallery?.[0]?.original ||
+      camper.coverImage ||
+      '/background-picture.jpg';
+
+    return {
       title,
       description,
-      url: canonicalUrl,
-      siteName: 'TravelTrucks',
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: camper.name || 'TravelTrucks camper',
-        },
-      ],
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [ogImage],
-    },
-  };
+      alternates: {
+        canonical: canonicalUrl,
+      },
+      openGraph: {
+        title,
+        description,
+        url: canonicalUrl,
+        siteName: 'TravelTrucks',
+        images: [
+          {
+            url: ogImage,
+            width: 1200,
+            height: 630,
+            alt: camper.name || 'TravelTrucks camper',
+          },
+        ],
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [ogImage],
+      },
+    };
+  } catch {
+    return {
+      title: 'Camper not found',
+      description:
+        'The camper you are looking for was not found on TravelTrucks.',
+    };
+  }
 }
 
 //===============================================================
@@ -75,15 +101,23 @@ async function CamperDetailsPage({ params }: PageProps) {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ['camper', id],
-    queryFn: () => fetchCamperById(id),
-  });
+  let camper: Awaited<ReturnType<typeof fetchCamperByIdFromServer>>;
+  let reviews: Awaited<ReturnType<typeof fetchCamperReviewsFromServer>>;
 
-  const camper = await queryClient.fetchQuery({
-    queryKey: ['camper', id],
-    queryFn: () => fetchCamperById(id),
-  });
+  try {
+    [camper, reviews] = await Promise.all([
+      queryClient.fetchQuery({
+        queryKey: ['camper', id],
+        queryFn: () => fetchCamperByIdFromServer(id),
+      }),
+      queryClient.fetchQuery({
+        queryKey: ['camper-reviews', id],
+        queryFn: () => fetchCamperReviewsFromServer(id),
+      }),
+    ]);
+  } catch {
+    notFound();
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -101,7 +135,8 @@ async function CamperDetailsPage({ params }: PageProps) {
         <CamperPageClient camperId={id} title={camper.name} />
 
         <CamperHero camper={camper} />
-        <CamperDetailsBottom camper={camper} />
+
+        <CamperDetailsBottom camper={camper} reviews={reviews} />
       </main>
     </HydrationBoundary>
   );

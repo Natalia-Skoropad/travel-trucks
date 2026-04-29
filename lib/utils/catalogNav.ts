@@ -1,8 +1,8 @@
 import type {
   CatalogFiltersValue,
   EquipmentKey,
-  VehicleForm,
   VehicleEngine,
+  VehicleForm,
   VehicleTransmission,
 } from '@/lib/constants/catalogFilters';
 
@@ -22,23 +22,30 @@ export function buildCatalogHref(patch: PartialFilters) {
   const next: CatalogFiltersValue = {
     ...DEFAULT_CATALOG_FILTERS,
     ...patch,
-    equipment: { ...(patch.equipment ?? {}) },
+    equipment: {
+      ...DEFAULT_CATALOG_FILTERS.equipment,
+      ...(patch.equipment ?? {}),
+    },
   };
 
   const params = new URLSearchParams();
 
-  if (next.location.trim()) params.set('location', next.location.trim());
-  if (next.form) params.set('form', next.form);
+  const location = next.location.trim();
 
+  if (location) params.set('location', location);
+  if (next.form) params.set('form', next.form);
   if (next.engine) params.set('engine', next.engine);
   if (next.transmission) params.set('transmission', next.transmission);
 
-  (Object.keys(next.equipment) as EquipmentKey[]).forEach((k) => {
-    if (next.equipment[k]) params.set(k, '1');
+  (Object.keys(next.equipment) as EquipmentKey[]).forEach((key) => {
+    if (next.equipment[key]) {
+      params.set(key, '1');
+    }
   });
 
-  const qs = params.toString();
-  return qs ? `/catalog?${qs}` : '/catalog';
+  const query = params.toString();
+
+  return query ? `/catalog?${query}` : '/catalog';
 }
 
 //===========================================================================
@@ -52,7 +59,11 @@ export function hrefByForm(form: VehicleForm) {
 }
 
 export function hrefByEquipment(key: EquipmentKey) {
-  return buildCatalogHref({ equipment: { [key]: true } });
+  return buildCatalogHref({
+    equipment: {
+      [key]: true,
+    },
+  });
 }
 
 export function hrefByEngine(engine: VehicleEngine) {
