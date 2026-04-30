@@ -3,9 +3,6 @@
   min-height: calc(100vh - 72px);
   overflow: hidden;
 
-  display: flex;
-  align-items: center;
-
   background: linear-gradient(
       180deg,
       rgba(16, 24, 40, 0.9) 0%,
@@ -20,11 +17,22 @@
     );
 }
 
+.centeredPage {
+  display: flex;
+  align-items: center;
+}
+
+.homePage {
+  padding: 200px 0;
+}
+
 .bgImage {
   object-fit: cover;
   object-position: center;
   z-index: 0;
+}
 
+.dimmedImage {
   opacity: 0.15;
 }
 
@@ -37,12 +45,42 @@
   max-width: 600px;
 }
 
-.code {
+.title {
+  margin-bottom: 20px;
+
+  color: var(--white);
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.notFoundTitle {
+  line-height: 1.05;
+}
+
+.text {
+  margin-bottom: 70px;
+
+  color: var(--white);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.mutedText {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.errorText {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.errorCode {
   display: inline-block;
   margin-bottom: 20px;
 
   padding: 8px 20px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 
   font-weight: 600;
   font-size: 20px;
@@ -53,30 +91,30 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.title {
-  color: var(--white);
-  font-weight: 600;
-  font-size: 48px;
-  line-height: 1;
-  margin-bottom: 20px;
-}
+.notFoundCode {
+  display: block;
+  margin-bottom: 16px;
 
-.text {
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 1.4;
-  margin-bottom: 70px;
+  font-weight: 700;
+  font-size: 100px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
   align-items: center;
+  gap: 12px;
 }
 
 @media only screen and (min-width: 768px) {
+  .homePage {
+    padding: 260px 0;
+  }
+
   .heroContent {
     max-width: 650px;
   }
@@ -88,6 +126,11 @@
   .text {
     font-size: 22px;
   }
+
+  .notFoundCode {
+    margin-bottom: 12px;
+    font-size: 160px;
+  }
 }
 
 @media only screen and (min-width: 1440px) {
@@ -95,12 +138,20 @@
     max-width: 800px;
   }
 
+  .homeContent {
+    max-width: unset;
+  }
+
   .title {
-    font-size: 64px;
     margin-bottom: 16px;
+    font-size: 64px;
   }
 
   .text {
     margin-bottom: 40px;
+  }
+
+  .notFoundCode {
+    font-size: 200px;
   }
 }

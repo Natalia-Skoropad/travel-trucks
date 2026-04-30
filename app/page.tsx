@@ -10,7 +10,7 @@ import {
 } from '@/lib/constants/metadata';
 import { buildMetadata } from '@/lib/seo/buildMetadata';
 
-import css from './page.module.css';
+import css from './shared-hero.module.css';
 
 //===========================================================================
 
@@ -33,7 +33,7 @@ export const metadata = buildMetadata({
 
 function Home() {
   return (
-    <main className={css.page}>
+    <main className={`${css.page} ${css.homePage}`}>
       <Image
         src={DEFAULT_OG_IMAGE}
         alt=""
@@ -44,7 +44,7 @@ function Home() {
       />
 
       <div className="container">
-        <div className={css.heroContent}>
+        <div className={`${css.heroContent} ${css.homeContent}`}>
           <h1 className={css.title}>Campers of your dreams</h1>
 
           <p className={css.text}>

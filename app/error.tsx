@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Button from '@/components/common/Button/Button';
 import ButtonLink from '@/components/common/Button/ButtonLink';
 
-import css from './error.module.css';
+import css from './shared-hero.module.css';
 
 //===============================================================
 
@@ -23,23 +23,23 @@ function GlobalError({ error, reset }: Props) {
   }, [error]);
 
   return (
-    <main className={css.page}>
+    <main className={`${css.page} ${css.centeredPage}`}>
       <Image
         src="/error-page.jpg"
         alt=""
         fill
         sizes="100vw"
         priority
-        className={css.bgImage}
+        className={`${css.bgImage} ${css.dimmedImage}`}
       />
 
       <div className="container">
         <div className={css.heroContent}>
-          <span className={css.code}>Error</span>
+          <span className={css.errorCode}>Error</span>
 
           <h1 className={css.title}>Something went wrong</h1>
 
-          <p className={css.text}>
+          <p className={`${css.text} ${css.errorText}`}>
             We couldn’t load this page right now. Try again, or return to the
             homepage.
           </p>
