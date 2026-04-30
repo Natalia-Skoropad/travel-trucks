@@ -120,41 +120,6 @@
   padding-top: 8px;
 }
 
-.dateWrap {
-  width: 100%;
-}
-
-:global(.react-datepicker-wrapper) {
-  width: 100%;
-}
-
-:global(.react-datepicker__input-container) {
-  width: 100%;
-}
-
-:global(.react-datepicker) {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 12px;
-  overflow: hidden;
-  font-family: inherit;
-}
-
-:global(.react-datepicker__header) {
-  background: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-:global(.react-datepicker__day--selected),
-:global(.react-datepicker__day--keyboard-selected) {
-  background: rgba(230, 68, 64, 0.9);
-  color: #fff;
-  border-radius: 8px;
-}
-
-:global(.react-datepicker__day:hover) {
-  border-radius: 8px;
-}
-
 @media only screen and (min-width: 1440px) {
   .card {
     padding: 32px;
