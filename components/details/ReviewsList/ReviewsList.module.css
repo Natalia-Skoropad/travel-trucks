@@ -1,10 +1,7 @@
-.section {
-  width: 100%;
-}
-
 .empty {
   margin: 0;
   padding: 24px 0;
+
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 16px;
@@ -22,7 +19,7 @@
   padding: 0;
 }
 
-.header {
+.head {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -48,14 +45,9 @@
   color: var(--button);
 }
 
-.meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
 .name {
+  margin: 0 0 4px;
+
   font-family: var(--font-family);
   font-weight: 500;
   font-size: 16px;
@@ -63,25 +55,28 @@
   color: var(--main);
 }
 
-.stars {
+.rating {
   display: inline-flex;
+  align-items: center;
   gap: 4px;
 }
 
 .star {
-  display: block;
-  fill: var(--rating);
-}
+  width: 16px;
+  height: 16px;
 
-.starOn {
-  opacity: 1;
-}
-
-.starOff {
+  color: var(--badges);
   fill: var(--badges);
 }
 
-.text {
+.starActive {
+  color: var(--rating);
+  fill: var(--rating);
+}
+
+.comment {
+  margin: 0;
+
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 16px;

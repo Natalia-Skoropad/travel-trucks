@@ -1,8 +1,8 @@
-.menuNav {
+.nav {
   display: block;
 }
 
-.menuList {
+.list {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -10,10 +10,16 @@
 }
 
 .link {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 8px 0;
+
   font-weight: 500;
   font-size: 20px;
+  line-height: 1.5;
   color: var(--main);
-  padding: 8px 0;
+
   transition: color 200ms ease;
 }
 
@@ -27,11 +33,9 @@
 }
 
 @media only screen and (min-width: 768px) {
-  .menuList {
-    display: flex;
+  .list {
     flex-direction: row;
     align-items: center;
-    gap: 32px;
   }
 
   .link {
