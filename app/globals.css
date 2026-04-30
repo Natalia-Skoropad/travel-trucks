@@ -25,6 +25,10 @@
   --success: #16a34a;
   --danger: #dc2626;
 
+  --input-hover: rgba(0, 0, 0, 0.045);
+  --input-placeholder: rgba(16, 24, 40, 0.45);
+  --focus-ring: rgba(228, 72, 72, 0.25);
+
   --radius-sm: 10px;
   --radius-md: 12px;
   --radius-lg: 16px;

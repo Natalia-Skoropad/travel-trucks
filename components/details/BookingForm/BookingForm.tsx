@@ -116,13 +116,23 @@ function BookingForm({ camperId }: Props) {
   return (
     <section className={css.section} aria-labelledby="booking-title">
       <div className={css.card}>
-        <h2 id="booking-title" className={css.title}>
-          Book your campervan now
-        </h2>
+        <div className={css.header}>
+          <h2 id="booking-title" className={css.title}>
+            Book your campervan and let us prepare your next road trip
+          </h2>
 
-        <p className={css.subtitle}>
-          Stay connected! We are always ready to help you.
-        </p>
+          <p className={css.subtitle}>
+            Send your contact details and our travel team will help you confirm
+            availability, rental conditions, and the next steps for your trip.
+          </p>
+
+          <ul className={css.benefits}>
+            <li>We contact you by email with booking details.</li>
+            <li>Your request is free and does not confirm payment.</li>
+            <li>We help you choose the best option for your route.</li>
+            <li>We’ll guide you through the booking process step by step.</li>
+          </ul>
+        </div>
 
         <Formik<Values>
           initialValues={initialValues}
@@ -146,6 +156,7 @@ function BookingForm({ camperId }: Props) {
                 <Field name="name">
                   {({ field }: FieldProps<string>) => {
                     const hasError = Boolean(touched.name && errors.name);
+                    const count = field.value?.length ?? 0;
 
                     return (
                       <div
@@ -160,6 +171,7 @@ function BookingForm({ camperId }: Props) {
                           placeholder="Name*"
                           autoComplete="name"
                           maxLength={NAME_MAX}
+                          aria-invalid={hasError}
                           onChange={(event) => {
                             const next = clampText(
                               event.target.value,
@@ -170,6 +182,10 @@ function BookingForm({ camperId }: Props) {
                             setDraft({ name: next });
                           }}
                         />
+
+                        <span className={css.counter}>
+                          {count}/{NAME_MAX}
+                        </span>
 
                         {hasError ? (
                           <span className={css.error} aria-live="polite">
@@ -184,6 +200,7 @@ function BookingForm({ camperId }: Props) {
                 <Field name="email">
                   {({ field }: FieldProps<string>) => {
                     const hasError = Boolean(touched.email && errors.email);
+                    const count = field.value?.length ?? 0;
 
                     return (
                       <div
@@ -198,6 +215,7 @@ function BookingForm({ camperId }: Props) {
                           placeholder="Email*"
                           autoComplete="email"
                           maxLength={EMAIL_MAX}
+                          aria-invalid={hasError}
                           onChange={(event) => {
                             const next = clampText(
                               event.target.value,
@@ -208,6 +226,10 @@ function BookingForm({ camperId }: Props) {
                             setDraft({ email: next });
                           }}
                         />
+
+                        <span className={css.counter}>
+                          {count}/{EMAIL_MAX}
+                        </span>
 
                         {hasError ? (
                           <span className={css.error} aria-live="polite">
