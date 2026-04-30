@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Filter } from 'lucide-react';
 
 import type { CamperDetails, CamperListItem } from '@/types/camper';
 import { fetchCamperById } from '@/lib/api/campersApi';
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
-import { LOCATIONS } from '@/lib/constants/locations';
 
 import { useCatalogCampers } from '@/hooks/useCatalogCampers';
 import { useCatalogFilters } from '@/hooks/useCatalogFilters';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useCatalogFilterOptions } from '@/hooks/useCatalogFilterOptions';
 
 import CatalogFilters from '@/components/catalog/CatalogFilters/CatalogFilters';
 import CatalogPageShell from '@/components/catalog/CatalogPageShell/CatalogPageShell';
@@ -31,12 +31,6 @@ type Props = {
 };
 
 type TabValue = 'all' | 'favorites';
-
-//===============================================================
-
-function uniqSorted(list: string[]) {
-  return Array.from(new Set(list)).sort((a, b) => a.localeCompare(b));
-}
 
 //===============================================================
 
@@ -66,6 +60,7 @@ function mapCamperDetailsToListItem(camper: CamperDetails): CamperListItem {
 
 function CatalogPageClient({ initialFilters, initialPage }: Props) {
   const openFiltersRef = useRef<(() => void) | null>(null);
+  const filterOptions = useCatalogFilterOptions();
 
   const {
     filters,
@@ -154,18 +149,6 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
     },
   ];
 
-  const locationSuggestions = useMemo(() => {
-    const fromCards = uniqSorted(
-      campers
-        .map((camper) => (camper.location ?? '').trim())
-        .filter((location) => location.length > 0)
-    );
-
-    const allowed = new Set<string>(LOCATIONS as readonly string[]);
-
-    return fromCards.filter((location) => allowed.has(location));
-  }, [campers]);
-
   const isCatalogBusy = isPending || isFetching;
 
   const desktopFilters = (
@@ -175,9 +158,11 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
       onReset={resetFilters}
       isResetDisabled={!filtersApplied || isCatalogBusy}
       isFiltering={isCatalogBusy}
-      locationSuggestions={locationSuggestions}
       showSearch
       showSort={false}
+      forms={filterOptions.forms}
+      transmissions={filterOptions.transmissions}
+      engines={filterOptions.engines}
     />
   );
 
@@ -188,9 +173,11 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
       onReset={resetFilters}
       isResetDisabled={!filtersApplied || isCatalogBusy}
       isFiltering={isCatalogBusy}
-      locationSuggestions={locationSuggestions}
       showSearch={false}
       showSort
+      forms={filterOptions.forms}
+      transmissions={filterOptions.transmissions}
+      engines={filterOptions.engines}
     />
   );
 

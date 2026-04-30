@@ -1,8 +1,11 @@
 'use client';
 
 import clsx from 'clsx';
-import type { VehicleEngine } from '@/lib/constants/catalogFilters';
-import { ENGINE_OPTIONS } from '@/lib/constants/catalogFilters';
+
+import {
+  ENGINE_OPTIONS,
+  type VehicleEngine,
+} from '@/lib/constants/catalogFilters';
 
 import css from '../VehicleEquipmentFilter/VehicleFilter.module.css';
 
@@ -12,11 +15,16 @@ type Props = {
   value: VehicleEngine | '';
   onChange: (next: VehicleEngine | '') => void;
   className?: string;
+  options?: VehicleEngine[];
 };
 
 //===========================================================================
 
-function VehicleEngineFilter({ value, onChange, className }: Props) {
+function VehicleEngineFilter({ value, onChange, className, options }: Props) {
+  const visibleOptions = ENGINE_OPTIONS.filter((item) =>
+    options?.length ? options.includes(item.value) : true
+  );
+
   const select = (next: VehicleEngine) => {
     onChange(value === next ? '' : next);
   };
@@ -27,21 +35,22 @@ function VehicleEngineFilter({ value, onChange, className }: Props) {
       <div className={css.divider} />
 
       <ul className={css.grid}>
-        {ENGINE_OPTIONS.map((t) => {
-          const active = value === t.value;
+        {visibleOptions.map((item) => {
+          const active = value === item.value;
 
           return (
-            <li key={t.value}>
+            <li key={item.value}>
               <button
                 type="button"
                 className={clsx(css.item, active && css.active)}
-                onClick={() => select(t.value)}
+                onClick={() => select(item.value)}
                 aria-pressed={active}
               >
                 <svg className={css.icon} aria-hidden="true">
-                  <use href={`/icons.svg#${t.icon}`} />
+                  <use href={`/icons.svg#${item.icon}`} />
                 </svg>
-                <span className={css.label}>{t.label}</span>
+
+                <span className={css.label}>{item.label}</span>
               </button>
             </li>
           );

@@ -1,8 +1,11 @@
 'use client';
 
 import clsx from 'clsx';
-import type { VehicleForm } from '@/lib/constants/catalogFilters';
-import { VEHICLE_FORMS } from '@/lib/constants/catalogFilters';
+
+import {
+  VEHICLE_FORMS,
+  type VehicleForm,
+} from '@/lib/constants/catalogFilters';
 
 import css from '../VehicleEquipmentFilter/VehicleFilter.module.css';
 
@@ -12,11 +15,16 @@ type Props = {
   value: VehicleForm | '';
   onChange: (next: VehicleForm | '') => void;
   className?: string;
+  options?: VehicleForm[];
 };
 
 //===========================================================================
 
-function VehicleFormFilter({ value, onChange, className }: Props) {
+function VehicleFormFilter({ value, onChange, className, options }: Props) {
+  const visibleOptions = VEHICLE_FORMS.filter((item) =>
+    options?.length ? options.includes(item.value) : true
+  );
+
   const select = (next: VehicleForm) => {
     onChange(value === next ? '' : next);
   };
@@ -27,21 +35,22 @@ function VehicleFormFilter({ value, onChange, className }: Props) {
       <div className={css.divider} />
 
       <ul className={css.grid}>
-        {VEHICLE_FORMS.map((t) => {
-          const active = value === t.value;
+        {visibleOptions.map((item) => {
+          const active = value === item.value;
 
           return (
-            <li key={t.value}>
+            <li key={item.value}>
               <button
                 type="button"
                 className={clsx(css.item, active && css.active)}
-                onClick={() => select(t.value)}
+                onClick={() => select(item.value)}
                 aria-pressed={active}
               >
                 <svg className={css.icon} aria-hidden="true">
-                  <use href={`/icons.svg#${t.icon}`} />
+                  <use href={`/icons.svg#${item.icon}`} />
                 </svg>
-                <span className={css.label}>{t.label}</span>
+
+                <span className={css.label}>{item.label}</span>
               </button>
             </li>
           );

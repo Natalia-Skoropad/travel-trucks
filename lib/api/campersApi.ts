@@ -1,6 +1,11 @@
 import axios from 'axios';
 
 import { campersServerApi, nextApi } from '@/lib/api/api';
+import {
+  buildEmptyCampersResponse,
+  getCampersCatalogResponse,
+  isBackendNotFoundError,
+} from '@/lib/server/campersCatalogService';
 
 import type { CamperDetails } from '@/types/camper';
 
@@ -28,16 +33,6 @@ function normalizeCampersResponse(data: unknown): CampersResponse {
     total: typeof value.total === 'number' ? value.total : 0,
     totalPages: typeof value.totalPages === 'number' ? value.totalPages : 0,
     campers: Array.isArray(value.campers) ? value.campers : [],
-  };
-}
-
-function buildEmptyCampersResponse(page = 1, perPage = 0): CampersResponse {
-  return {
-    page,
-    perPage,
-    total: 0,
-    totalPages: 0,
-    campers: [],
   };
 }
 
@@ -69,16 +64,9 @@ export async function fetchCampersFromServer(
   params?: CampersQuery
 ): Promise<CampersResponse> {
   try {
-    const { data } = await nextApi.get<CampersResponse>('/campers', {
-      params,
-      paramsSerializer: {
-        indexes: null,
-      },
-    });
-
-    return normalizeCampersResponse(data);
+    return await getCampersCatalogResponse(params);
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
+    if (isBackendNotFoundError(error)) {
       return buildEmptyCampersResponse(params?.page, params?.perPage);
     }
 
@@ -146,6 +134,7 @@ export async function fetchCamperFilters(): Promise<CamperFiltersResponse> {
     forms: Array.isArray(data.forms) ? data.forms : [],
     transmissions: Array.isArray(data.transmissions) ? data.transmissions : [],
     engines: Array.isArray(data.engines) ? data.engines : [],
+    locations: Array.isArray(data.locations) ? data.locations : [],
   };
 }
 

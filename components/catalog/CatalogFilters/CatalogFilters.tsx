@@ -2,7 +2,13 @@
 
 import { X } from 'lucide-react';
 
-import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
+import type {
+  CatalogFiltersValue,
+  VehicleEngine,
+  VehicleForm,
+  VehicleTransmission,
+} from '@/lib/constants/catalogFilters';
+
 import { LOCATIONS } from '@/lib/constants/locations';
 
 import CatalogSearch from '@/components/catalog/CatalogSearch/CatalogSearch';
@@ -14,6 +20,7 @@ import VehicleTransmissionFilter from '@/components/catalog/VehicleTransmissionF
 import VehicleEngineFilter from '@/components/catalog/VehicleEngineFilter/VehicleEngineFilter';
 
 import Button from '@/components/common/Button/Button';
+
 import css from './CatalogFilters.module.css';
 
 //===========================================================================
@@ -22,12 +29,19 @@ type Props = {
   value: CatalogFiltersValue;
   onChange: (next: CatalogFiltersValue) => void;
   onReset: () => void;
+
   locationSuggestions?: string[];
   className?: string;
+
   isResetDisabled?: boolean;
   isFiltering?: boolean;
+
   showSearch?: boolean;
   showSort?: boolean;
+
+  forms?: VehicleForm[];
+  transmissions?: VehicleTransmission[];
+  engines?: VehicleEngine[];
 };
 
 //===========================================================================
@@ -36,12 +50,20 @@ function CatalogFilters({
   value,
   onChange,
   onReset,
+  locationSuggestions,
   className,
   isResetDisabled = false,
   isFiltering = false,
   showSearch = true,
   showSort = false,
+  forms,
+  transmissions,
+  engines,
 }: Props) {
+  const locations = locationSuggestions?.length
+    ? locationSuggestions
+    : [...LOCATIONS];
+
   return (
     <section className={`${css.panel} ${className ?? ''}`}>
       <h2 className="visually-hidden">Catalog filters</h2>
@@ -77,7 +99,7 @@ function CatalogFilters({
 
         <LocationFilter
           value={value.location}
-          suggestions={[...LOCATIONS]}
+          suggestions={locations}
           onChange={(location) => onChange({ ...value, location })}
         />
       </div>
@@ -92,6 +114,7 @@ function CatalogFilters({
       <div className={css.block}>
         <VehicleFormFilter
           value={value.form}
+          options={forms}
           onChange={(form) => onChange({ ...value, form })}
         />
       </div>
@@ -99,6 +122,7 @@ function CatalogFilters({
       <div className={css.block}>
         <VehicleTransmissionFilter
           value={value.transmission}
+          options={transmissions}
           onChange={(transmission) => onChange({ ...value, transmission })}
         />
       </div>
@@ -106,6 +130,7 @@ function CatalogFilters({
       <div className={css.block}>
         <VehicleEngineFilter
           value={value.engine}
+          options={engines}
           onChange={(engine) => onChange({ ...value, engine })}
         />
       </div>

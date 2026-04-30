@@ -1,8 +1,11 @@
 'use client';
 
 import clsx from 'clsx';
-import type { EquipmentKey } from '@/lib/constants/catalogFilters';
-import { EQUIPMENT_OPTIONS } from '@/lib/constants/catalogFilters';
+
+import {
+  EQUIPMENT_OPTIONS,
+  type EquipmentKey,
+} from '@/lib/constants/catalogFilters';
 
 import css from './VehicleFilter.module.css';
 
@@ -19,7 +22,11 @@ type Props = {
 function VehicleEquipmentFilter({ value, onChange, className }: Props) {
   const toggle = (key: EquipmentKey) => {
     const current = Boolean(value[key]);
-    onChange({ ...value, [key]: !current });
+
+    onChange({
+      ...value,
+      [key]: !current,
+    });
   };
 
   return (
@@ -28,21 +35,22 @@ function VehicleEquipmentFilter({ value, onChange, className }: Props) {
       <div className={css.divider} />
 
       <ul className={css.grid}>
-        {EQUIPMENT_OPTIONS.map((opt) => {
-          const active = value[opt.key] === true;
+        {EQUIPMENT_OPTIONS.map((option) => {
+          const active = value[option.key] === true;
 
           return (
-            <li key={opt.key}>
+            <li key={option.key}>
               <button
                 type="button"
                 className={clsx(css.item, active && css.active)}
-                onClick={() => toggle(opt.key)}
+                onClick={() => toggle(option.key)}
                 aria-pressed={active}
               >
                 <svg className={css.icon} aria-hidden="true">
-                  <use href={`/icons.svg#${opt.icon}`} />
+                  <use href={`/icons.svg#${option.icon}`} />
                 </svg>
-                <span className={css.label}>{opt.label}</span>
+
+                <span className={css.label}>{option.label}</span>
               </button>
             </li>
           );

@@ -22,6 +22,7 @@ export type CamperFiltersResponse = {
   forms: CamperForm[];
   transmissions: CamperTransmission[];
   engines: CamperEngine[];
+  locations: string[];
 };
 
 //===============================================================
