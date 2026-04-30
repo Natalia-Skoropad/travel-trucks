@@ -139,7 +139,7 @@ export const VEHICLE_FORMS: Array<{
   {
     value: 'semi_integrated',
     label: CAMPER_FORM_LABELS.semi_integrated,
-    icon: 'icon-grid-2x2',
+    icon: 'icon-semi-integrated',
   },
   {
     value: 'alcove',
@@ -158,12 +158,12 @@ export const TRANSMISSION_OPTIONS: Array<{
   {
     value: 'automatic',
     label: TRANSMISSION_LABELS.automatic,
-    icon: 'icon-fuel-pump',
+    icon: 'icon-automatic',
   },
   {
     value: 'manual',
     label: TRANSMISSION_LABELS.manual,
-    icon: 'icon-fuel-pump',
+    icon: 'icon-manual',
   },
 ];
 
@@ -177,22 +177,22 @@ export const ENGINE_OPTIONS: Array<{
   {
     value: 'diesel',
     label: ENGINE_LABELS.diesel,
-    icon: 'icon-fuel-pump',
+    icon: 'icon-diesel',
   },
   {
     value: 'petrol',
     label: ENGINE_LABELS.petrol,
-    icon: 'icon-fuel-pump',
+    icon: 'icon-petrol',
   },
   {
     value: 'hybrid',
     label: ENGINE_LABELS.hybrid,
-    icon: 'icon-fuel-pump',
+    icon: 'icon-hybrid',
   },
   {
     value: 'electric',
     label: ENGINE_LABELS.electric,
-    icon: 'icon-fuel-pump',
+    icon: 'icon-electric-refueling',
   },
 ];
 
