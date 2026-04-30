@@ -3,6 +3,7 @@ import type {
   CamperDetails,
   CamperListItem,
 } from '@/types/camper';
+
 import type { FeatureBadgeItem } from '@/components/common/FeatureBadges/FeatureBadges';
 
 import {
@@ -13,18 +14,11 @@ import {
   formatTransmissionLabel,
 } from '@/lib/constants/catalogFilters';
 
-import {
-  hrefByEngine,
-  hrefByEquipment,
-  hrefByTransmission,
-} from '@/lib/utils/catalogNav';
+import { hrefByEquipment } from '@/lib/utils/catalogNav';
 
 //===========================================================================
 
-type CamperWithFeatures = Pick<
-  CamperListItem | CamperDetails,
-  'transmission' | 'engine' | 'amenities'
->;
+type CamperWithFeatures = Pick<CamperListItem | CamperDetails, 'amenities'>;
 
 //===========================================================================
 
@@ -41,11 +35,11 @@ export function formatVehicleForm(value: CamperListItem['form']) {
   return formatCamperFormLabel(value);
 }
 
-export function formatTransmission(value: CamperWithFeatures['transmission']) {
+export function formatTransmission(value: CamperListItem['transmission']) {
   return formatTransmissionLabel(value);
 }
 
-export function formatEngine(value: CamperWithFeatures['engine']) {
+export function formatEngine(value: CamperListItem['engine']) {
   return formatEngineLabel(value);
 }
 
@@ -58,26 +52,9 @@ export function formatAmenity(value: CamperAmenity) {
 export function buildFeatureBadges(
   camper: CamperWithFeatures
 ): FeatureBadgeItem[] {
-  const badges: FeatureBadgeItem[] = [
-    {
-      label: formatTransmissionLabel(camper.transmission),
-      icon: 'icon-fuel-pump',
-      href: hrefByTransmission(camper.transmission),
-    },
-    {
-      label: formatEngineLabel(camper.engine),
-      icon: 'icon-fuel-pump',
-      href: hrefByEngine(camper.engine),
-    },
-  ];
-
-  camper.amenities.forEach((amenity) => {
-    badges.push({
-      label: formatAmenityLabel(amenity),
-      icon: getAmenityIcon(amenity),
-      href: hrefByEquipment(amenity),
-    });
-  });
-
-  return badges;
+  return camper.amenities.map((amenity) => ({
+    label: formatAmenityLabel(amenity),
+    icon: getAmenityIcon(amenity),
+    href: hrefByEquipment(amenity),
+  }));
 }

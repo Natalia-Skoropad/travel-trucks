@@ -1,10 +1,17 @@
 import Link from 'next/link';
 
 import type { CamperDetails } from '@/types/camper';
-import { hrefByForm } from '@/lib/utils/catalogNav';
+
+import {
+  hrefByEngine,
+  hrefByForm,
+  hrefByTransmission,
+} from '@/lib/utils/catalogNav';
 
 import {
   buildFeatureBadges,
+  formatEngine,
+  formatTransmission,
   formatVehicleForm,
 } from '@/lib/utils/camperBadges';
 
@@ -16,6 +23,8 @@ import css from './CamperSpecs.module.css';
 
 const DETAILS = [
   { key: 'form', label: 'Form' },
+  { key: 'transmission', label: 'Transmission' },
+  { key: 'engine', label: 'Engine' },
   { key: 'length', label: 'Length' },
   { key: 'width', label: 'Width' },
   { key: 'height', label: 'Height' },
@@ -45,21 +54,46 @@ function CamperSpecs({ camper, className }: Props) {
       <div className={css.divider} />
 
       <dl className={css.details}>
-        {DETAILS.map(({ key, label }) => (
-          <div key={key} className={css.row}>
-            <dt className={css.dt}>{label}</dt>
+        {DETAILS.map(({ key, label }) => {
+          let value: React.ReactNode = camper[key];
 
-            <dd className={css.dd}>
-              {key === 'form' ? (
-                <Link href={hrefByForm(camper.form)} className={css.formLink}>
-                  {formatVehicleForm(camper.form)}
-                </Link>
-              ) : (
-                camper[key]
-              )}
-            </dd>
-          </div>
-        ))}
+          if (key === 'form') {
+            value = (
+              <Link href={hrefByForm(camper.form)} className={css.detailLink}>
+                {formatVehicleForm(camper.form)}
+              </Link>
+            );
+          }
+
+          if (key === 'transmission') {
+            value = (
+              <Link
+                href={hrefByTransmission(camper.transmission)}
+                className={css.detailLink}
+              >
+                {formatTransmission(camper.transmission)}
+              </Link>
+            );
+          }
+
+          if (key === 'engine') {
+            value = (
+              <Link
+                href={hrefByEngine(camper.engine)}
+                className={css.detailLink}
+              >
+                {formatEngine(camper.engine)}
+              </Link>
+            );
+          }
+
+          return (
+            <div key={key} className={css.row}>
+              <dt className={css.dt}>{label}</dt>
+              <dd className={css.dd}>{value}</dd>
+            </div>
+          );
+        })}
       </dl>
     </section>
   );

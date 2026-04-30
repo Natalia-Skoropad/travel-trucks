@@ -53,15 +53,15 @@
   color: var(--main);
 }
 
-.formLink {
+.detailLink {
   position: relative;
-  color: inherit;
+
+  color: var(--button-hover);
   text-decoration: none;
   cursor: pointer;
-  color: var(--button-hover);
 }
 
-.formLink::after {
+.detailLink::after {
   content: '';
   position: absolute;
   left: 0;
@@ -79,8 +79,8 @@
   pointer-events: none;
 }
 
-.formLink:hover::after,
-.formLink:focus-visible::after {
+.detailLink:hover::after,
+.detailLink:focus-visible::after {
   transform: scaleX(1);
 }
 
