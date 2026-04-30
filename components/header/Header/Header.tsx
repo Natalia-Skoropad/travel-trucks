@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Menu } from 'lucide-react';
 
 import CompanyLogo from '@/components/header/CompanyLogo/CompanyLogo';
@@ -16,21 +16,6 @@ function Header() {
 
   const openMenu = () => setIsMobileMenuOpen(true);
   const closeMenu = () => setIsMobileMenuOpen(false);
-
-  useEffect(() => {
-    if (!isMobileMenuOpen) return;
-
-    const prevOverflow = document.body.style.overflow;
-    const prevTouchAction = document.body.style.touchAction;
-
-    document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      document.body.style.touchAction = prevTouchAction;
-    };
-  }, [isMobileMenuOpen]);
 
   return (
     <header className={css.header}>
