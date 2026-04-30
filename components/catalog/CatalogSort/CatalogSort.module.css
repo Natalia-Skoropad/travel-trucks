@@ -68,7 +68,7 @@
   width: 100%;
   overflow: hidden;
 
-  background: var(--color-white, #fff);
+  background: var(--white);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);

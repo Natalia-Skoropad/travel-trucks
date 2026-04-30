@@ -13,7 +13,7 @@
   max-width: 375px;
   height: 100%;
 
-  background: var(--color-white, #fff);
+  background: var(--white);
 
   padding: 20px;
   overflow: auto;

@@ -7,7 +7,7 @@
   padding: 16px;
   border-radius: 10px;
 
-  background: var(--color-white, #fff);
+  background: var(--white);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 

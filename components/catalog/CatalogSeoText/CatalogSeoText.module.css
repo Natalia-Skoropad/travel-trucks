@@ -1,9 +1,9 @@
 .section {
   margin-top: 48px;
   padding: 28px;
-  border: 1px solid var(--color-border, #dadde1);
+  border: 1px solid var(--gray-light);
   border-radius: 20px;
-  background-color: var(--color-white, #ffffff);
+  background: var(--white);
 }
 
 .title {
@@ -11,19 +11,19 @@
   font-size: 24px;
   line-height: 1.2;
   font-weight: 600;
-  color: var(--color-main, #101828);
+  color: var(--main);
 }
 
 .text {
   max-width: 860px;
   font-size: 16px;
   line-height: 1.5;
-  color: var(--color-text-muted, #475467);
+  color: var(--text);
 }
 
 .highlight {
   font-weight: 700;
-  color: var(--color-main, #101828);
+  color: var(--main);
 }
 
 @media only screen and (min-width: 768px) {

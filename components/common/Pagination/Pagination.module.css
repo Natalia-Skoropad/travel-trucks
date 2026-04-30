@@ -20,25 +20,25 @@
   min-width: 44px;
   height: 44px;
   padding: 0 12px;
-  border: 1px solid var(--color-border, #dadde1);
+  border: 1px solid var(--gray-light);
   border-radius: 999px;
-  background-color: var(--color-white, #ffffff);
+  background-color: var(--white);
   font-weight: 600;
-  color: var(--color-main, #101828);
+  color: var(--main);
   transition: border-color 200ms ease, color 200ms ease,
     background-color 200ms ease;
 }
 
 .pageBtn:hover:not(:disabled),
 .pageBtn:focus-visible {
-  border-color: var(--color-accent, #e44848);
-  color: var(--color-accent, #e44848);
+  border-color: var(--button);
+  color: var(--button);
 }
 
 .active {
-  border-color: var(--color-accent, #e44848);
-  background-color: var(--color-accent, #e44848);
-  color: #ffffff;
+  border-color: var(--button);
+  background-color: var(--button);
+  color: var(--white);
 }
 
 .pageBtn:disabled {
