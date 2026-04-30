@@ -8,6 +8,7 @@ import {
 } from '@/lib/server/campersCatalogService';
 
 import type { CamperDetails } from '@/types/camper';
+import { normalizeCamperDetails } from '@/lib/utils/normalizeCamper';
 
 import type {
   BookingRequestPayload,
@@ -80,19 +81,17 @@ export async function fetchCampersFromServer(
 export async function fetchCamperByIdFromServer(
   id: string
 ): Promise<CamperDetails> {
-  const { data } = await campersServerApi.get<CamperDetails>(
+  const { data } = await campersServerApi.get(
     `/campers/${encodeURIComponent(id)}`
   );
 
-  return data;
+  return normalizeCamperDetails(data);
 }
 
 export async function fetchCamperById(id: string): Promise<CamperDetails> {
-  const { data } = await nextApi.get<CamperDetails>(
-    `/campers/${encodeURIComponent(id)}`
-  );
+  const { data } = await nextApi.get(`/campers/${encodeURIComponent(id)}`);
 
-  return data;
+  return normalizeCamperDetails(data);
 }
 
 //===========================================================================

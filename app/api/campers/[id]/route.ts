@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
 import { campersServerApi } from '@/lib/api/api';
+import { normalizeCamperDetails } from '@/lib/utils/normalizeCamper';
 
 //===========================================================================
 
@@ -21,7 +22,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       `/campers/${encodeURIComponent(id)}`
     );
 
-    return NextResponse.json(data);
+    return NextResponse.json(normalizeCamperDetails(data));
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status) {
       return NextResponse.json(
