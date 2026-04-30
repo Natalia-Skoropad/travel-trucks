@@ -31,7 +31,7 @@ export type CamperGalleryItem = {
 
 //===============================================================
 
-export type CamperListItem = {
+export type CamperBase = {
   id: string;
   name: string;
   price: number;
@@ -49,13 +49,18 @@ export type CamperListItem = {
   engine: CamperEngine;
   amenities: CamperAmenity[];
 
-  coverImage: string;
   totalReviews: number;
 };
 
 //===============================================================
 
-export type CamperDetails = CamperListItem & {
+export type CamperListItem = CamperBase & {
+  coverImage: string;
+};
+
+//===============================================================
+
+export type CamperDetails = CamperBase & {
   description: string;
   gallery: CamperGalleryItem[];
   createdAt: string;

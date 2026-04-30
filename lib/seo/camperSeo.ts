@@ -59,7 +59,7 @@ export function buildCamperDescription(camper: CamperDetails) {
 //===========================================================================
 
 export function getCamperOgImage(camper: CamperDetails) {
-  return camper.gallery?.[0]?.original || camper.coverImage || DEFAULT_OG_IMAGE;
+  return camper.gallery?.[0]?.original || DEFAULT_OG_IMAGE;
 }
 
 //===========================================================================

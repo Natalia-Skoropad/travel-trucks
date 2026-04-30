@@ -61,17 +61,7 @@ export function useCatalogFilters(
     startTransition(() => {
       router.replace(href, { scroll: false });
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    page,
-    effectiveFilters.search,
-    effectiveFilters.location,
-    effectiveFilters.form,
-    effectiveFilters.engine,
-    effectiveFilters.transmission,
-    effectiveFilters.sort,
-    JSON.stringify(effectiveFilters.equipment),
-  ]);
+  }, [effectiveFilters, page, router]);
 
   const setFilters = (next: CatalogFiltersValue) => {
     setPageState(1);

@@ -16,6 +16,8 @@ import VehicleEngineFilter from '@/components/catalog/VehicleEngineFilter/Vehicl
 import Button from '@/components/common/Button/Button';
 import css from './CatalogFilters.module.css';
 
+//===========================================================================
+
 type Props = {
   value: CatalogFiltersValue;
   onChange: (next: CatalogFiltersValue) => void;
@@ -27,6 +29,8 @@ type Props = {
   showSearch?: boolean;
   showSort?: boolean;
 };
+
+//===========================================================================
 
 function CatalogFilters({
   value,

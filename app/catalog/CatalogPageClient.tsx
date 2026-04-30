@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Filter } from 'lucide-react';
 
-import type { CamperListItem } from '@/types/camper';
+import type { CamperDetails, CamperListItem } from '@/types/camper';
 import { fetchCamperById } from '@/lib/api/campersApi';
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
 import { LOCATIONS } from '@/lib/constants/locations';
@@ -23,6 +23,8 @@ import Tabs from '@/components/common/Tabs/Tabs';
 
 import css from '@/components/catalog/CatalogPageShell/CatalogPageShell.module.css';
 
+//===============================================================
+
 type Props = {
   initialFilters: CatalogFiltersValue;
   initialPage: number;
@@ -30,9 +32,37 @@ type Props = {
 
 type TabValue = 'all' | 'favorites';
 
+//===============================================================
+
 function uniqSorted(list: string[]) {
   return Array.from(new Set(list)).sort((a, b) => a.localeCompare(b));
 }
+
+//===============================================================
+
+function mapCamperDetailsToListItem(camper: CamperDetails): CamperListItem {
+  return {
+    id: camper.id,
+    name: camper.name,
+    price: camper.price,
+    rating: camper.rating,
+    location: camper.location,
+    form: camper.form,
+    length: camper.length,
+    width: camper.width,
+    height: camper.height,
+    tank: camper.tank,
+    consumption: camper.consumption,
+    transmission: camper.transmission,
+    engine: camper.engine,
+    amenities: camper.amenities,
+    totalReviews: camper.totalReviews,
+    coverImage:
+      camper.gallery?.[0]?.thumb ?? camper.gallery?.[0]?.original ?? '',
+  };
+}
+
+//===============================================================
 
 function CatalogPageClient({ initialFilters, initialPage }: Props) {
   const openFiltersRef = useRef<(() => void) | null>(null);
@@ -89,7 +119,9 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
           })
         );
 
-        const clean = results.filter((item) => item !== null);
+        const clean = results
+          .filter((item): item is CamperDetails => item !== null)
+          .map(mapCamperDetailsToListItem);
 
         if (!cancelled) {
           setFavoriteItems(clean);

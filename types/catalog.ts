@@ -34,18 +34,17 @@ export type CamperSort =
 
 //===============================================================
 
-export type CampersQuery = {
+type BackendCampersQuery = {
   page?: number;
   perPage?: number;
-
   location?: string;
   form?: CamperForm;
-
   transmission?: CamperTransmission;
   engine?: CamperEngine;
+};
 
+export type CampersQuery = BackendCampersQuery & {
   search?: string;
   sort?: CamperSort;
-
   equipment?: CamperAmenity[];
 };
