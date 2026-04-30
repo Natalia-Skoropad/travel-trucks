@@ -21,5 +21,5 @@ export function buildAbsoluteUrl(path = '/') {
 //===========================================================================
 
 export function buildPageTitle(title: string) {
-  return `${title} | ${SITE_NAME}`;
+  return title;
 }

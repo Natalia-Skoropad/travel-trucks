@@ -102,7 +102,7 @@ export const EQUIPMENT_OPTIONS: Array<{
 }> = [
   { key: 'ac', label: AMENITY_LABELS.ac, icon: 'icon-wind' },
   { key: 'bathroom', label: AMENITY_LABELS.bathroom, icon: 'icon-shower' },
-  { key: 'gas', label: AMENITY_LABELS.gas, icon: 'icon-gas-stove' },
+  { key: 'gas', label: AMENITY_LABELS.gas, icon: 'icon-gas' },
   { key: 'kitchen', label: AMENITY_LABELS.kitchen, icon: 'icon-cup-hot' },
   { key: 'radio', label: AMENITY_LABELS.radio, icon: 'icon-radios' },
   {
