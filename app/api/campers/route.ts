@@ -3,14 +3,32 @@ import axios from 'axios';
 
 import { campersServerApi } from '@/lib/api/api';
 
-import type { CamperAmenity, CamperListItem } from '@/types/camper';
+import {
+  BACKEND_AGGREGATION_PER_PAGE,
+  CATALOG_PER_PAGE,
+} from '@/lib/constants/pagination';
+
+import {
+  AMENITY_VALUES,
+  CAMPER_FORM_VALUES,
+  ENGINE_VALUES,
+  SORT_VALUES,
+  TRANSMISSION_VALUES,
+} from '@/lib/constants/catalogFilters';
+
+import type {
+  CamperAmenity,
+  CamperEngine,
+  CamperForm,
+  CamperListItem,
+  CamperTransmission,
+} from '@/types/camper';
+
 import type { CamperSort, CampersResponse } from '@/types/catalog';
 
 //===========================================================================
 
 const DEFAULT_PAGE = 1;
-const DEFAULT_PER_PAGE = 4;
-const AGGREGATION_PER_PAGE = 100;
 
 //===========================================================================
 
@@ -18,9 +36,9 @@ type BackendCampersParams = {
   page: number;
   perPage: number;
   location?: string;
-  form?: string;
-  transmission?: string;
-  engine?: string;
+  form?: CamperForm;
+  transmission?: CamperTransmission;
+  engine?: CamperEngine;
 };
 
 type CatalogEnhancementParams = {
@@ -31,17 +49,21 @@ type CatalogEnhancementParams = {
 
 //===========================================================================
 
-const AMENITY_VALUES: CamperAmenity[] = [
-  'ac',
-  'bathroom',
-  'kitchen',
-  'tv',
-  'radio',
-  'refrigerator',
-  'microwave',
-  'gas',
-  'water',
-];
+function isCamperForm(value: string | null): value is CamperForm {
+  return Boolean(value && CAMPER_FORM_VALUES.includes(value as CamperForm));
+}
+
+function isCamperTransmission(
+  value: string | null
+): value is CamperTransmission {
+  return Boolean(
+    value && TRANSMISSION_VALUES.includes(value as CamperTransmission)
+  );
+}
+
+function isCamperEngine(value: string | null): value is CamperEngine {
+  return Boolean(value && ENGINE_VALUES.includes(value as CamperEngine));
+}
 
 //===========================================================================
 
@@ -65,7 +87,7 @@ function normalizeCampersResponse(data: unknown): CampersResponse {
   return {
     page: typeof value.page === 'number' ? value.page : DEFAULT_PAGE,
     perPage:
-      typeof value.perPage === 'number' ? value.perPage : DEFAULT_PER_PAGE,
+      typeof value.perPage === 'number' ? value.perPage : CATALOG_PER_PAGE,
     total: typeof value.total === 'number' ? value.total : 0,
     totalPages: typeof value.totalPages === 'number' ? value.totalPages : 0,
     campers: Array.isArray(value.campers) ? value.campers : [],
@@ -73,12 +95,7 @@ function normalizeCampersResponse(data: unknown): CampersResponse {
 }
 
 function isCamperSort(value: string | null): value is CamperSort {
-  return (
-    value === 'price-asc' ||
-    value === 'price-desc' ||
-    value === 'rating-asc' ||
-    value === 'rating-desc'
-  );
+  return Boolean(value && SORT_VALUES.includes(value as CamperSort));
 }
 
 function isCamperAmenity(value: string): value is CamperAmenity {
@@ -90,20 +107,9 @@ function isCamperAmenity(value: string): value is CamperAmenity {
 function getEquipmentFromSearchParams(
   searchParams: URLSearchParams
 ): CamperAmenity[] {
-  const values = [
-    ...searchParams.getAll('equipment'),
-    ...searchParams.getAll('amenities'),
-  ].filter(isCamperAmenity);
+  const equipment = searchParams.getAll('equipment').filter(isCamperAmenity);
 
-  for (const amenity of AMENITY_VALUES) {
-    const flag = searchParams.get(amenity);
-
-    if (flag === '1' || flag === 'true') {
-      values.push(amenity);
-    }
-  }
-
-  return Array.from(new Set(values));
+  return Array.from(new Set(equipment));
 }
 
 function getBackendParams(
@@ -111,13 +117,17 @@ function getBackendParams(
   page: number,
   perPage: number
 ): BackendCampersParams {
+  const form = searchParams.get('form');
+  const transmission = searchParams.get('transmission');
+  const engine = searchParams.get('engine');
+
   return {
     page,
     perPage,
-    location: searchParams.get('location') || undefined,
-    form: searchParams.get('form') || undefined,
-    transmission: searchParams.get('transmission') || undefined,
-    engine: searchParams.get('engine') || undefined,
+    location: searchParams.get('location')?.trim() || undefined,
+    form: isCamperForm(form) ? form : undefined,
+    transmission: isCamperTransmission(transmission) ? transmission : undefined,
+    engine: isCamperEngine(engine) ? engine : undefined,
   };
 }
 
@@ -155,7 +165,7 @@ async function fetchAllBackendCampers(baseParams: BackendCampersParams) {
   const firstPage = await fetchBackendCampers({
     ...baseParams,
     page: 1,
-    perPage: AGGREGATION_PER_PAGE,
+    perPage: BACKEND_AGGREGATION_PER_PAGE,
   });
 
   if (firstPage.totalPages <= 1) {
@@ -169,7 +179,7 @@ async function fetchAllBackendCampers(baseParams: BackendCampersParams) {
     fetchBackendCampers({
       ...baseParams,
       page,
-      perPage: AGGREGATION_PER_PAGE,
+      perPage: BACKEND_AGGREGATION_PER_PAGE,
     })
   );
 
@@ -238,7 +248,7 @@ function paginateCampers(
 
 //===========================================================================
 
-function buildEmptyResponse(page = DEFAULT_PAGE, perPage = DEFAULT_PER_PAGE) {
+function buildEmptyResponse(page = DEFAULT_PAGE, perPage = CATALOG_PER_PAGE) {
   return {
     page,
     perPage,
@@ -256,7 +266,7 @@ export async function GET(request: NextRequest) {
   const page = toPositiveNumber(searchParams.get('page'), DEFAULT_PAGE);
   const perPage = toPositiveNumber(
     searchParams.get('perPage'),
-    DEFAULT_PER_PAGE
+    CATALOG_PER_PAGE
   );
 
   const backendParams = getBackendParams(searchParams, page, perPage);
@@ -276,35 +286,27 @@ export async function GET(request: NextRequest) {
       enhancementParams.search
     );
 
-    const filteredCampers = filterByEquipment(
+    const equipmentFilteredCampers = filterByEquipment(
       searchedCampers,
       enhancementParams.equipment
     );
 
-    const sortedCampers = sortCampers(filteredCampers, enhancementParams.sort);
+    const sortedCampers = sortCampers(
+      equipmentFilteredCampers,
+      enhancementParams.sort
+    );
 
-    return NextResponse.json(paginateCampers(sortedCampers, page, perPage));
+    const data = paginateCampers(sortedCampers, page, perPage);
+
+    return NextResponse.json(data);
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status ?? 500;
-
-      if (status === 404) {
-        return NextResponse.json(buildEmptyResponse(page, perPage), {
-          status: 200,
-        });
-      }
-
-      return NextResponse.json(
-        {
-          error:
-            error.response?.data?.message ||
-            error.response?.data?.error ||
-            error.message,
-        },
-        { status }
-      );
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return NextResponse.json(buildEmptyResponse(page, perPage));
     }
 
-    return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Failed to fetch campers' },
+      { status: 500 }
+    );
   }
 }
