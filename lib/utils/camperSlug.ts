@@ -32,8 +32,20 @@ export function getCamperIdFromSlug(slug: string) {
 
 //===========================================================================
 
+export function getCamperSlug(camper: { id: string; name: string }) {
+  return createCamperSlug(camper.name, camper.id);
+}
+
+//===========================================================================
+
 export function buildCamperHref(camper: { id: string; name: string }) {
-  return `/catalog/${createCamperSlug(camper.name, camper.id)}`;
+  return `/${getCamperSlug(camper)}`;
+}
+
+//===========================================================================
+
+export function buildLegacyCamperHref(camper: { id: string; name: string }) {
+  return `/catalog/${getCamperSlug(camper)}`;
 }
 
 //===========================================================================

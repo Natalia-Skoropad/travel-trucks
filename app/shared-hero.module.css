@@ -1,6 +1,6 @@
 .page {
   position: relative;
-  min-height: calc(100vh - 72px);
+  min-height: calc(100vh - 88px);
   overflow: hidden;
 
   background: linear-gradient(
