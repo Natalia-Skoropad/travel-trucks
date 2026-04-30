@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-query';
 
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
 import { CATALOG_PER_PAGE } from '@/lib/constants/pagination';
 import { fetchCampersFromServer } from '@/lib/api/campersApi';
@@ -39,6 +39,22 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { segments } = await params;
+
+  if (isCatalogDetailsPath(segments)) {
+    const slug = segments![0];
+
+    return {
+      title: 'Redirecting camper page',
+      alternates: {
+        canonical: `/${slug}`,
+      },
+      robots: {
+        index: false,
+        follow: true,
+      },
+    };
+  }
+
   const { filters, page } = parseCatalogSegments(segments);
 
   return buildCatalogMetadata({
@@ -53,7 +69,7 @@ async function CatalogSegmentsPage({ params }: PageProps) {
   const { segments } = await params;
 
   if (isCatalogDetailsPath(segments)) {
-    redirect(`/${segments![0]}`);
+    permanentRedirect(`/${segments![0]}`);
   }
 
   const { filters, page } = parseCatalogSegments(segments);
