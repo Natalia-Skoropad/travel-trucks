@@ -14,10 +14,22 @@ import {
 
 //===========================================================================
 
+const DESCRIPTION_MAX_LENGTH = 160;
+
+//===========================================================================
+
 function truncate(value: string, maxLength: number) {
   if (value.length <= maxLength) return value;
 
   return `${value.slice(0, maxLength - 1).trim()}…`;
+}
+
+function getAbsoluteImageUrl(src: string) {
+  if (src.startsWith('http://') || src.startsWith('https://')) {
+    return src;
+  }
+
+  return buildAbsoluteUrl(src);
 }
 
 //===========================================================================
@@ -29,49 +41,48 @@ export function buildCamperTitle(camper: CamperDetails) {
 //===========================================================================
 
 export function buildCamperDescription(camper: CamperDetails) {
-  const parts: string[] = [];
+  const ownDescription = camper.description?.trim();
 
-  if (camper.location) {
-    parts.push(`Location: ${camper.location}.`);
+  if (ownDescription) {
+    return truncate(ownDescription, DESCRIPTION_MAX_LENGTH);
   }
 
-  if (camper.form) {
-    parts.push(`Vehicle form: ${camper.form.replace('_', ' ')}.`);
-  }
+  const fallbackParts = [
+    camper.location ? `Location: ${camper.location}.` : '',
+    camper.form ? `Vehicle form: ${camper.form.replace('_', ' ')}.` : '',
+    camper.transmission ? `Transmission: ${camper.transmission}.` : '',
+    camper.engine ? `Engine: ${camper.engine}.` : '',
+  ].filter(Boolean);
 
-  if (camper.transmission) {
-    parts.push(`Transmission: ${camper.transmission}.`);
-  }
+  const fallbackDescription = fallbackParts.join(' ');
 
-  if (camper.engine) {
-    parts.push(`Engine: ${camper.engine}.`);
-  }
-
-  if (camper.description?.trim()) {
-    parts.push(camper.description.trim());
-  }
-
-  const description = parts.join(' ');
-
-  return truncate(description || DEFAULT_SITE_DESCRIPTION, 160);
+  return truncate(
+    fallbackDescription || DEFAULT_SITE_DESCRIPTION,
+    DESCRIPTION_MAX_LENGTH
+  );
 }
 
 //===========================================================================
 
 export function getCamperOgImage(camper: CamperDetails) {
-  return camper.gallery?.[0]?.original || DEFAULT_OG_IMAGE;
+  return (
+    camper.gallery?.[0]?.original ||
+    camper.gallery?.[0]?.thumb ||
+    DEFAULT_OG_IMAGE
+  );
 }
 
 //===========================================================================
 
 export function buildCamperMetadata(camper: CamperDetails): Metadata {
   const title = buildCamperTitle(camper);
+  const pageTitle = buildPageTitle(title);
   const description = buildCamperDescription(camper);
   const url = buildAbsoluteUrl(buildCamperHref(camper));
-  const image = getCamperOgImage(camper);
+  const image = getAbsoluteImageUrl(getCamperOgImage(camper));
 
   return {
-    title: buildPageTitle(title),
+    title: pageTitle,
     description,
 
     alternates: {
@@ -79,7 +90,7 @@ export function buildCamperMetadata(camper: CamperDetails): Metadata {
     },
 
     openGraph: {
-      title: buildPageTitle(title),
+      title: pageTitle,
       description,
       url,
       siteName: SITE_NAME,
@@ -96,7 +107,7 @@ export function buildCamperMetadata(camper: CamperDetails): Metadata {
 
     twitter: {
       card: 'summary_large_image',
-      title: buildPageTitle(title),
+      title: pageTitle,
       description,
       images: [image],
     },
