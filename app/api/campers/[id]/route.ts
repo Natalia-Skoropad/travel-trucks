@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
 import { campersServerApi } from '@/lib/api/api';
 
 //===========================================================================
 
-type Props = {
+type RouteContext = {
   params: Promise<{
     id: string;
   }>;
@@ -13,8 +13,8 @@ type Props = {
 
 //===========================================================================
 
-export async function GET(_: Request, { params }: Props) {
-  const { id } = await params;
+export async function GET(_request: NextRequest, context: RouteContext) {
+  const { id } = await context.params;
 
   try {
     const { data } = await campersServerApi.get(
@@ -23,20 +23,16 @@ export async function GET(_: Request, { params }: Props) {
 
     return NextResponse.json(data);
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status ?? 500;
-
+    if (axios.isAxiosError(error) && error.response?.status) {
       return NextResponse.json(
-        {
-          error:
-            error.response?.data?.message ||
-            error.response?.data?.error ||
-            error.message,
-        },
-        { status }
+        { message: 'Failed to fetch camper' },
+        { status: error.response.status }
       );
     }
 
-    return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Failed to fetch camper' },
+      { status: 500 }
+    );
   }
 }

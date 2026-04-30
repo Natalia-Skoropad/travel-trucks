@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
 import { campersServerApi } from '@/lib/api/api';
-
 import type { BookingRequestPayload } from '@/types/booking';
 
 //===========================================================================
 
-type Props = {
+type RouteContext = {
   params: Promise<{
     id: string;
   }>;
@@ -15,60 +14,52 @@ type Props = {
 
 //===========================================================================
 
-function isValidPayload(value: unknown): value is BookingRequestPayload {
-  if (!value || typeof value !== 'object') return false;
+function normalizeBookingPayload(data: unknown): BookingRequestPayload {
+  const value = data as Partial<BookingRequestPayload>;
 
-  const payload = value as Partial<BookingRequestPayload>;
+  return {
+    name: typeof value.name === 'string' ? value.name.trim() : '',
+    email: typeof value.email === 'string' ? value.email.trim() : '',
+  };
+}
 
-  return (
-    typeof payload.name === 'string' &&
-    payload.name.trim().length >= 2 &&
-    typeof payload.email === 'string' &&
-    payload.email.trim().length > 0
-  );
+function isValidBookingPayload(payload: BookingRequestPayload) {
+  return Boolean(payload.name && payload.email);
 }
 
 //===========================================================================
 
-export async function POST(request: NextRequest, { params }: Props) {
-  const { id } = await params;
+export async function POST(request: NextRequest, context: RouteContext) {
+  const { id } = await context.params;
 
   try {
-    const body: unknown = await request.json();
+    const body = await request.json();
+    const payload = normalizeBookingPayload(body);
 
-    if (!isValidPayload(body)) {
+    if (!isValidBookingPayload(payload)) {
       return NextResponse.json(
-        { error: 'Name and email are required' },
+        { message: 'Name and email are required' },
         { status: 400 }
       );
     }
-
-    const payload: BookingRequestPayload = {
-      name: body.name.trim(),
-      email: body.email.trim(),
-    };
 
     const { data } = await campersServerApi.post(
       `/campers/${encodeURIComponent(id)}/booking-requests`,
       payload
     );
 
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(data);
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status ?? 500;
-
+    if (axios.isAxiosError(error) && error.response?.status) {
       return NextResponse.json(
-        {
-          error:
-            error.response?.data?.message ||
-            error.response?.data?.error ||
-            error.message,
-        },
-        { status }
+        error.response.data ?? { message: 'Failed to create booking request' },
+        { status: error.response.status }
       );
     }
 
-    return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Failed to create booking request' },
+      { status: 500 }
+    );
   }
 }
