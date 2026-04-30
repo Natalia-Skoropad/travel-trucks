@@ -21,7 +21,7 @@ import Button from '@/components/common/Button/Button';
 import Pagination from '@/components/common/Pagination/Pagination';
 import Tabs from '@/components/common/Tabs/Tabs';
 
-import css from '@/components/catalog/CatalogPageShell/CatalogPageShell.module.css';
+import css from './CatalogPageClient.module.css';
 
 //===============================================================
 

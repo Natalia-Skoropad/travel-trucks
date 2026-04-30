@@ -31,13 +31,13 @@ import {
 } from '@/lib/seo/camperSeo';
 
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
-import CatalogPageClient from '../CatalogPageClient';
+import CatalogPageClient from '../_components/CatalogPageClient';
 import CatalogSeoText from '@/components/catalog/CatalogSeoText/CatalogSeoText';
 
 import CamperHero from '@/components/details/CamperHero/CamperHero';
 import CamperDetailsBottom from '@/components/details/CamperDetailsBottom/CamperDetailsBottom';
 import CamperPrevNextNav from '@/components/details/CamperPrevNextNav/CamperPrevNextNav';
-import CamperPageClient from '../[id]/CamperPageClient';
+import CamperPageClient from '../_components/CamperPageClient';
 
 //===========================================================================
 

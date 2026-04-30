@@ -6,7 +6,7 @@ import FavoriteButton from '@/components/common/FavoriteButton/FavoriteButton';
 import Toast from '@/components/common/Toast/Toast';
 import { useFavorites } from '@/hooks/useFavorites';
 
-import css from './page.module.css';
+import css from './CamperPageClient.module.css';
 
 //===============================================================
 
