@@ -1,16 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Filter } from 'lucide-react';
 
-import type { CamperDetails, CamperListItem } from '@/types/camper';
-import { fetchCamperById } from '@/lib/api/campersApi';
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
 
 import { useCatalogCampers } from '@/hooks/useCatalogCampers';
 import { useCatalogFilters } from '@/hooks/useCatalogFilters';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useCatalogFilterOptions } from '@/hooks/useCatalogFilterOptions';
+import { useFavoriteCampers } from '@/hooks/useFavoriteCampers';
 
 import CatalogFilters from '@/components/catalog/CatalogFilters/CatalogFilters';
 import CatalogPageShell from '@/components/catalog/CatalogPageShell/CatalogPageShell';
@@ -34,33 +33,11 @@ type TabValue = 'all' | 'favorites';
 
 //===============================================================
 
-function mapCamperDetailsToListItem(camper: CamperDetails): CamperListItem {
-  return {
-    id: camper.id,
-    name: camper.name,
-    price: camper.price,
-    rating: camper.rating,
-    location: camper.location,
-    form: camper.form,
-    length: camper.length,
-    width: camper.width,
-    height: camper.height,
-    tank: camper.tank,
-    consumption: camper.consumption,
-    transmission: camper.transmission,
-    engine: camper.engine,
-    amenities: camper.amenities,
-    totalReviews: camper.totalReviews,
-    coverImage:
-      camper.gallery?.[0]?.thumb ?? camper.gallery?.[0]?.original ?? '',
-  };
-}
-
-//===============================================================
-
 function CatalogPageClient({ initialFilters, initialPage }: Props) {
   const openFiltersRef = useRef<(() => void) | null>(null);
   const filterOptions = useCatalogFilterOptions();
+
+  const [tab, setTab] = useState<TabValue>('all');
 
   const {
     filters,
@@ -78,9 +55,11 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
 
   const { favoriteIds, favoritesCount } = useFavorites();
 
-  const [tab, setTab] = useState<TabValue>('all');
-  const [favoriteItems, setFavoriteItems] = useState<CamperListItem[]>([]);
-  const [isFavLoading, setIsFavLoading] = useState(false);
+  const {
+    data: favoriteItems = [],
+    isLoading: isFavLoading,
+    isFetching: isFavFetching,
+  } = useFavoriteCampers(favoriteIds, tab === 'favorites');
 
   const updateFilters = (patch: Partial<CatalogFiltersValue>) => {
     setFilters({
@@ -89,51 +68,6 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
       equipment: patch.equipment ?? { ...filters.equipment },
     });
   };
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadFavorites() {
-      if (tab !== 'favorites') return;
-
-      if (!favoriteIds.length) {
-        setFavoriteItems([]);
-        return;
-      }
-
-      setIsFavLoading(true);
-
-      try {
-        const results = await Promise.all(
-          favoriteIds.map(async (id) => {
-            try {
-              return await fetchCamperById(id);
-            } catch {
-              return null;
-            }
-          })
-        );
-
-        const clean = results
-          .filter((item): item is CamperDetails => item !== null)
-          .map(mapCamperDetailsToListItem);
-
-        if (!cancelled) {
-          setFavoriteItems(clean);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsFavLoading(false);
-        }
-      }
-    }
-
-    void loadFavorites();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [tab, favoriteIds]);
 
   const visibleItems = tab === 'favorites' ? favoriteItems : campers;
 
@@ -231,7 +165,9 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
         <CampersList
           campers={visibleItems}
           isLoading={
-            tab === 'favorites' ? isFavLoading : isLoading && tab === 'all'
+            tab === 'favorites'
+              ? isFavLoading || isFavFetching
+              : isLoading && tab === 'all'
           }
           emptyText={
             tab === 'favorites'

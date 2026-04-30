@@ -29,6 +29,7 @@ function GlobalError({ error, reset }: Props) {
         alt=""
         fill
         sizes="100vw"
+        priority
         className={css.bgImage}
       />
 

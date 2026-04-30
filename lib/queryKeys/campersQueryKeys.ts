@@ -40,4 +40,7 @@ export const campersQueryKeys = {
   reviews: (id: string) => [...campersQueryKeys.all, 'reviews', id] as const,
 
   filters: () => [...campersQueryKeys.all, 'filters'] as const,
+
+  favorites: (ids: string[]) =>
+    [...campersQueryKeys.all, 'favorites', [...ids].sort()] as const,
 };

@@ -29,6 +29,7 @@ function NotFound() {
         alt=""
         fill
         sizes="100vw"
+        priority
         className={css.bgImage}
       />
 
