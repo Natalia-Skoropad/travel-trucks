@@ -1,4 +1,5 @@
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
+
 import { buildCatalogSeoText } from '@/lib/seo/catalogSeo';
 
 import css from './CatalogSeoText.module.css';
@@ -12,20 +13,14 @@ type Props = {
 //===========================================================================
 
 function CatalogSeoText({ filters }: Props) {
-  const seo = buildCatalogSeoText(filters);
+  const { descriptionParts } = buildCatalogSeoText(filters);
 
   return (
-    <section className={css.section} aria-labelledby="catalog-seo-title">
-      <h2 id="catalog-seo-title" className={css.title}>
-        {seo.title}
-      </h2>
-
+    <section className={css.section} aria-label="Catalog information">
       <p className={css.text}>
-        {seo.descriptionParts.map((part, index) =>
+        {descriptionParts.map((part, index) =>
           part.highlighted ? (
-            <strong key={index} className={css.highlight}>
-              {part.text}
-            </strong>
+            <strong key={index}>{part.text}</strong>
           ) : (
             <span key={index}>{part.text}</span>
           )

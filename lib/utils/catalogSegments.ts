@@ -8,7 +8,6 @@ import type {
 
 import {
   AMENITY_VALUES,
-  formatAmenityLabel,
   formatCamperFormLabel,
   formatEngineLabel,
   formatTransmissionLabel,
@@ -331,25 +330,6 @@ export function buildCatalogBreadcrumbs(
     items.push({
       label: formatEngineLabel(filters.engine),
       href: buildCatalogPath(current),
-    });
-  }
-
-  const amenities = getActiveAmenities(filters);
-
-  if (amenities.length) {
-    amenities.forEach((amenity) => {
-      current = {
-        ...current,
-        equipment: {
-          ...current.equipment,
-          [amenity]: true,
-        },
-      };
-
-      items.push({
-        label: formatAmenityLabel(amenity),
-        href: buildCatalogPath(current),
-      });
     });
   }
 
