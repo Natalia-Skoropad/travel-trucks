@@ -6,6 +6,7 @@ import { Filter } from 'lucide-react';
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
 
 import { buildCatalogSeoText } from '@/lib/seo/catalogSeo';
+import { getAppliedFiltersCount } from '@/lib/utils/catalogFiltersCount';
 
 import { useCatalogCampers } from '@/hooks/useCatalogCampers';
 import { useCatalogFilters } from '@/hooks/useCatalogFilters';
@@ -17,7 +18,6 @@ import CatalogFilters from '@/components/catalog/CatalogFilters/CatalogFilters';
 import CatalogPageShell from '@/components/catalog/CatalogPageShell/CatalogPageShell';
 import CampersList from '@/components/catalog/CampersList/CampersList';
 import CatalogSearch from '@/components/catalog/CatalogSearch/CatalogSearch';
-import CatalogSort from '@/components/catalog/CatalogSort/CatalogSort';
 import Button from '@/components/common/Button/Button';
 import Pagination from '@/components/common/Pagination/Pagination';
 import Tabs from '@/components/common/Tabs/Tabs';
@@ -89,6 +89,7 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
 
   const isCatalogBusy = isPending || isFetching;
   const isResetBusy = filtersApplied && isCatalogBusy;
+  const appliedFiltersCount = getAppliedFiltersCount(effectiveFilters);
   const catalogSeoTitle = buildCatalogSeoText(effectiveFilters).title;
 
   const desktopFilters = (
@@ -99,7 +100,7 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
       isResetDisabled={!filtersApplied || isResetBusy}
       isFiltering={isResetBusy}
       showSearch
-      showSort={false}
+      showSort
       forms={filterOptions.forms}
       transmissions={filterOptions.transmissions}
       engines={filterOptions.engines}
@@ -139,12 +140,6 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
           ariaLabel="Catalog tabs"
           renderPanel={() => <span aria-hidden="true" />}
         />
-
-        <CatalogSort
-          value={filters.sort}
-          onChange={(sort) => updateFilters({ sort })}
-          className={css.sortDesktop}
-        />
       </div>
 
       <div className={css.mobileSearchRow}>
@@ -161,7 +156,13 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
           onClick={() => openFiltersRef.current?.()}
           className={css.mobileFilterButton}
         >
-          Filters
+          <span className={css.filterButtonContent}>
+            <span>Filters</span>
+
+            {appliedFiltersCount > 0 ? (
+              <span className={css.filterCount}>{appliedFiltersCount}</span>
+            ) : null}
+          </span>
         </Button>
       </div>
 

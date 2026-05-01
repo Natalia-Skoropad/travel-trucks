@@ -8,28 +8,10 @@
   color: var(--main);
 }
 
-.layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-}
-
-.sidebar {
-  display: none;
-}
-
-.content {
-  min-width: 0;
-}
-
 .catalogTop {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.sortDesktop {
-  display: none;
 }
 
 .mobileSearchRow {
@@ -45,8 +27,32 @@
 }
 
 .mobileFilterButton {
-  min-width: 112px;
+  min-width: 138px;
   height: 48px;
+}
+
+.filterButtonContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--white);
 }
 
 .listWrap {
@@ -69,25 +75,10 @@
     margin-bottom: 30px;
   }
 
-  .layout {
-    grid-template-columns: 360px minmax(0, 1fr);
-    align-items: start;
-    gap: 32px;
-  }
-
-  .sidebar {
-    display: block;
-  }
-
   .catalogTop {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-  }
-
-  .sortDesktop {
-    display: block;
-    width: 260px;
   }
 
   .mobileSearchRow {

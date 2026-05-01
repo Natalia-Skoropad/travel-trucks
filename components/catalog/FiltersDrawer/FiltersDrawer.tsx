@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock';
 import { useEscapeToClose } from '@/hooks/useEscapeToClose';
+
+import CloseButton from '@/components/common/CloseButton/CloseButton';
 
 import css from './FiltersDrawer.module.css';
 
@@ -18,7 +19,6 @@ type Props = {
 
 function FiltersDrawer({ children, onOpenFilters }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const open = useCallback(() => {
     setIsOpen(true);
@@ -31,16 +31,6 @@ function FiltersDrawer({ children, onOpenFilters }: Props) {
   useEffect(() => {
     onOpenFilters(open);
   }, [onOpenFilters, open]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const timeoutId = window.setTimeout(() => {
-      closeButtonRef.current?.focus();
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [isOpen]);
 
   useEscapeToClose(isOpen, close);
   useBodyScrollLock(isOpen);
@@ -67,15 +57,7 @@ function FiltersDrawer({ children, onOpenFilters }: Props) {
             Filters
           </h2>
 
-          <button
-            ref={closeButtonRef}
-            type="button"
-            className={css.closeButton}
-            aria-label="Close filters"
-            onClick={close}
-          >
-            <X size={24} aria-hidden="true" />
-          </button>
+          <CloseButton onClick={close} />
         </div>
 
         <div className={css.body}>{children}</div>

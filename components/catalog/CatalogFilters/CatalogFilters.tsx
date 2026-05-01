@@ -68,35 +68,37 @@ function CatalogFilters({
     <section className={`${css.panel} ${className ?? ''}`}>
       <h2 className="visually-hidden">Catalog filters</h2>
 
+      {showSearch || showSort ? (
+        <div className={css.topControls}>
+          {showSearch ? (
+            <CatalogSearch
+              id="catalog-search-desktop"
+              value={value.search}
+              onChange={(search) => onChange({ ...value, search })}
+            />
+          ) : null}
+
+          {showSort ? (
+            <CatalogSort
+              value={value.sort}
+              onChange={(sort) => onChange({ ...value, sort })}
+            />
+          ) : null}
+        </div>
+      ) : null}
+
       <div className={css.actions}>
         <Button
           onClick={onReset}
           variant="reset"
           disabled={isResetDisabled}
-          iconLeft={!isFiltering ? <X className={css.resetBtn} /> : undefined}
+          iconLeft={!isFiltering ? <X className={css.resetIcon} /> : undefined}
         >
           {isFiltering ? 'Please wait… Filtering' : 'Reset all filters'}
         </Button>
       </div>
 
-      {showSort ? (
-        <div className={css.block}>
-          <CatalogSort
-            value={value.sort}
-            onChange={(sort) => onChange({ ...value, sort })}
-          />
-        </div>
-      ) : null}
-
       <div className={css.block}>
-        {showSearch ? (
-          <CatalogSearch
-            id="catalog-search-desktop"
-            value={value.search}
-            onChange={(search) => onChange({ ...value, search })}
-          />
-        ) : null}
-
         <LocationFilter
           value={value.location}
           suggestions={locations}

@@ -1,24 +1,30 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  z-index: 50;
 
-  display: flex;
-  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.35);
 }
 
-.panel {
-  width: 100%;
-  max-width: 375px;
-  height: 100%;
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1001;
+
+  width: min(100%, 390px);
+  height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
 
   background: var(--white);
-
-  padding: 20px;
-  overflow: auto;
-
-  box-shadow: -12px 0 30px rgba(0, 0, 0, 0.12);
+  box-shadow: -16px 0 40px rgba(16, 24, 40, 0.16);
 }
 
 .header {
@@ -26,7 +32,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--gray-light);
 }
 
 .title {
@@ -37,29 +45,19 @@
   color: var(--main);
 }
 
-.content {
-  padding-bottom: 24px;
-}
-
-.drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 90;
-
-  width: min(100%, 375px);
-  height: 100dvh;
-  padding: 32px 24px;
-
+.body {
+  flex: 1;
   overflow-y: auto;
 
-  background: var(--white);
-  box-shadow: -16px 0 40px rgba(16, 24, 40, 0.16);
+  padding: 20px 24px 32px;
 }
 
 @media only screen and (min-width: 768px) {
-  .panel {
-    max-width: 420px;
-    padding: 24px;
+  .drawer {
+    width: 430px;
+  }
+
+  .body {
+    padding: 24px 28px 36px;
   }
 }
