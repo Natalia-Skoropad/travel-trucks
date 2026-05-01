@@ -21,7 +21,6 @@ import {
 import { buildCatalogMetadata } from '@/lib/seo/catalogSeo';
 
 import Breadcrumbs from '@/components/common/Breadcrumbs/Breadcrumbs';
-import CatalogSeoText from '@/components/catalog/CatalogSeoText/CatalogSeoText';
 
 import CatalogPageClient from './CatalogPageClient';
 
@@ -76,19 +75,13 @@ async function CatalogSegmentsPage({ params }: PageProps) {
 
   const queryClient = new QueryClient();
 
-  const initialData = await queryClient.fetchQuery({
+  await queryClient.fetchQuery({
     queryKey: campersQueryKeys.list(filters, page, CATALOG_PER_PAGE),
     queryFn: () =>
       fetchCampersFromServer(
         buildCatalogApiParams(filters, page, CATALOG_PER_PAGE)
       ),
   });
-
-  const hasCampers = Boolean(initialData.campers.length);
-
-  const hasSearch = Boolean(filters.search.trim());
-  const hasSort = Boolean(filters.sort);
-  const shouldShowSeoText = page === 1 && hasCampers && !hasSearch && !hasSort;
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -97,8 +90,6 @@ async function CatalogSegmentsPage({ params }: PageProps) {
           <Breadcrumbs items={buildCatalogBreadcrumbs(filters, page)} />
 
           <CatalogPageClient initialFilters={filters} initialPage={page} />
-
-          {shouldShowSeoText ? <CatalogSeoText filters={filters} /> : null}
         </div>
       </main>
     </HydrationBoundary>

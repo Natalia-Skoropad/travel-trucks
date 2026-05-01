@@ -20,6 +20,7 @@ import CampersList from '@/components/catalog/CampersList/CampersList';
 import CatalogSearch from '@/components/catalog/CatalogSearch/CatalogSearch';
 import Button from '@/components/common/Button/Button';
 import Pagination from '@/components/common/Pagination/Pagination';
+import CatalogSeoText from '@/components/catalog/CatalogSeoText/CatalogSeoText';
 import Tabs from '@/components/common/Tabs/Tabs';
 
 import css from './CatalogPageClient.module.css';
@@ -189,6 +190,14 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
           disabled={isCatalogBusy}
           onPageChange={setPage}
         />
+      ) : null}
+
+      {tab === 'all' &&
+      page === 1 &&
+      total > 0 &&
+      !effectiveFilters.search.trim() &&
+      !effectiveFilters.sort ? (
+        <CatalogSeoText filters={effectiveFilters} />
       ) : null}
     </CatalogPageShell>
   );
