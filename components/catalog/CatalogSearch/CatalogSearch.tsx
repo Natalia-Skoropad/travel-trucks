@@ -11,6 +11,13 @@ type Props = {
   id?: string;
 };
 
+function normalizeSearchInput(value: string) {
+  return value
+    .replace(/[^A-Za-z0-9\s'-]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .slice(0, 50);
+}
+
 function CatalogSearch({
   value,
   onChange,
@@ -34,7 +41,9 @@ function CatalogSearch({
           placeholder="Search by camper name"
           autoComplete="off"
           maxLength={50}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => {
+            onChange(normalizeSearchInput(event.target.value));
+          }}
         />
 
         {value ? (

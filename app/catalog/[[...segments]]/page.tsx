@@ -86,6 +86,10 @@ async function CatalogSegmentsPage({ params }: PageProps) {
 
   const hasCampers = Boolean(initialData.campers.length);
 
+  const hasSearch = Boolean(filters.search.trim());
+  const hasSort = Boolean(filters.sort);
+  const shouldShowSeoText = page === 1 && hasCampers && !hasSearch && !hasSort;
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <main>
@@ -94,9 +98,7 @@ async function CatalogSegmentsPage({ params }: PageProps) {
 
           <CatalogPageClient initialFilters={filters} initialPage={page} />
 
-          {page === 1 && hasCampers ? (
-            <CatalogSeoText filters={filters} />
-          ) : null}
+          {shouldShowSeoText ? <CatalogSeoText filters={filters} /> : null}
         </div>
       </main>
     </HydrationBoundary>

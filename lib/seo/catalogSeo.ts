@@ -9,7 +9,6 @@ import {
   formatAmenityLabel,
   formatCamperFormLabel,
   formatEngineLabel,
-  formatSortLabel,
   formatTransmissionLabel,
 } from '@/lib/constants/catalogFilters';
 
@@ -32,40 +31,65 @@ function getActiveAmenities(filters: CatalogFiltersValue) {
   );
 }
 
+function getSeoFilters(filters: CatalogFiltersValue): CatalogFiltersValue {
+  return {
+    ...filters,
+    search: '',
+    sort: '',
+    equipment: { ...filters.equipment },
+  };
+}
+
+function lower(value: string) {
+  return value.toLowerCase();
+}
+
+function getArticle(value: string) {
+  const firstLetter = value.trim().charAt(0).toLowerCase();
+
+  return ['a', 'e', 'i', 'o', 'u'].includes(firstLetter) ? 'an' : 'a';
+}
+
+function joinHumanList(items: string[]) {
+  if (items.length <= 1) return items[0] ?? '';
+
+  if (items.length === 2) {
+    return `${items[0]} and ${items[1]}`;
+  }
+
+  return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+}
+
+function buildReadableCatalogPhrase(filters: CatalogFiltersValue) {
+  const location = filters.location.trim();
+
+  const form = filters.form ? lower(formatCamperFormLabel(filters.form)) : '';
+  const transmission = filters.transmission
+    ? `${lower(formatTransmissionLabel(filters.transmission))} transmission`
+    : '';
+  const engine = filters.engine
+    ? `${lower(formatEngineLabel(filters.engine))} engine`
+    : '';
+
+  const details = [transmission, engine].filter(Boolean);
+
+  const base = form ? `${getArticle(form)} ${form} camper` : 'your camper';
+
+  const locationText = location ? ` in ${location}` : '';
+  const detailsText = details.length ? ` with ${joinHumanList(details)}` : '';
+
+  return `${base}${locationText}${detailsText}`;
+}
+
 //===========================================================================
 
 export function buildCatalogTitle(filters: CatalogFiltersValue, page = 1) {
-  const parts: string[] = [];
+  const phrase = buildReadableCatalogPhrase(filters);
 
-  if (filters.location.trim()) {
-    parts.push(filters.location.trim());
-  }
-
-  if (filters.form) {
-    parts.push(formatCamperFormLabel(filters.form));
-  }
-
-  if (filters.transmission) {
-    parts.push(formatTransmissionLabel(filters.transmission));
-  }
-
-  if (filters.engine) {
-    parts.push(formatEngineLabel(filters.engine));
-  }
-
-  const amenities = getActiveAmenities(filters).map(formatAmenityLabel);
-
-  if (amenities.length) {
-    parts.push(amenities.join(', '));
-  }
-
-  if (filters.sort) {
-    parts.push(formatSortLabel(filters.sort));
-  }
-
-  const baseTitle = parts.length
-    ? `Camper rental — ${parts.join(' • ')}`
-    : 'Camper rental catalog';
+  const baseTitle =
+    phrase === 'your camper'
+      ? 'Camper rental catalog'
+      : `Camper rental — ${phrase}`;
 
   return page > 1 ? `${baseTitle} — Page ${page}` : baseTitle;
 }
@@ -79,12 +103,6 @@ export function buildCatalogDescription(
   const location = filters.location.trim();
 
   const details: string[] = [];
-
-  const search = filters.search.trim();
-
-  if (search) {
-    details.push(`matching "${search}"`);
-  }
 
   if (location) {
     details.push(`in ${location}`);
@@ -122,35 +140,14 @@ export function buildCatalogDescription(
 export function buildCatalogSeoText(filters: CatalogFiltersValue) {
   const location = filters.location.trim();
 
-  const highlights: string[] = [];
-
-  if (filters.search.trim()) {
-    highlights.push(`Search: ${filters.search.trim()}`);
-  }
-
-  if (location) {
-    highlights.push(location);
-  }
-
-  if (filters.form) {
-    highlights.push(formatCamperFormLabel(filters.form));
-  }
-
-  if (filters.transmission) {
-    highlights.push(formatTransmissionLabel(filters.transmission));
-  }
-
-  if (filters.engine) {
-    highlights.push(formatEngineLabel(filters.engine));
-  }
-
   const amenities = getActiveAmenities(filters).map(formatAmenityLabel);
 
-  highlights.push(...amenities);
+  const readablePhrase = buildReadableCatalogPhrase(filters);
 
-  const title = highlights.length
-    ? `Choose your ${highlights.join(' • ')} camper for the next road trip`
-    : 'Choose your camper for the next road trip';
+  const title =
+    readablePhrase === 'your camper'
+      ? 'Choose your camper for the next road trip'
+      : `Choose ${readablePhrase} for the next road trip`;
 
   const descriptionParts = [
     {
@@ -158,14 +155,6 @@ export function buildCatalogSeoText(filters: CatalogFiltersValue) {
       highlighted: false,
     },
   ];
-
-  if (filters.search.trim()) {
-    descriptionParts.push({ text: ' matching ', highlighted: false });
-    descriptionParts.push({
-      text: filters.search.trim(),
-      highlighted: true,
-    });
-  }
 
   if (location) {
     descriptionParts.push({ text: ' in ', highlighted: false });
@@ -230,11 +219,16 @@ export function buildCatalogMetadata({
   filters: CatalogFiltersValue;
   page: number;
 }): Metadata {
-  const title = buildCatalogTitle(filters, page);
-  const description = buildCatalogDescription(filters, page);
+  const seoFilters = getSeoFilters(filters);
 
-  const canonicalPath = buildCatalogPath(filters);
+  const title = buildCatalogTitle(seoFilters, page);
+  const description = buildCatalogDescription(seoFilters, page);
+
+  const canonicalPath = buildCatalogPath(seoFilters);
   const currentPath = buildCatalogPath(filters, page);
+
+  const hasSearch = Boolean(filters.search.trim());
+  const hasSort = Boolean(filters.sort);
 
   return {
     title: buildPageTitle(title),
@@ -245,7 +239,7 @@ export function buildCatalogMetadata({
     },
 
     robots:
-      page > 1
+      page > 1 || hasSearch || hasSort
         ? {
             index: false,
             follow: true,

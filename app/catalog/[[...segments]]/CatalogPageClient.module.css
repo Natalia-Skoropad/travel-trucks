@@ -1,3 +1,13 @@
+.pageTitle {
+  margin-bottom: 24px;
+
+  font-family: var(--font-family);
+  font-weight: var(--fw-semibold);
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--main);
+}
+
 .layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -44,12 +54,21 @@
 }
 
 @media only screen and (min-width: 768px) {
+  .pageTitle {
+    margin-bottom: 28px;
+    font-size: 25px;
+  }
+
   .mobileSearchRow {
     gap: 16px;
   }
 }
 
 @media only screen and (min-width: 1440px) {
+  .pageTitle {
+    margin-bottom: 30px;
+  }
+
   .layout {
     grid-template-columns: 360px minmax(0, 1fr);
     align-items: start;

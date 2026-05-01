@@ -18,6 +18,19 @@ function cloneFilters(filters: CatalogFiltersValue): CatalogFiltersValue {
   };
 }
 
+function resetOnlyCatalogFilters(
+  filters: CatalogFiltersValue
+): CatalogFiltersValue {
+  return {
+    ...filters,
+    location: '',
+    form: '',
+    engine: '',
+    transmission: '',
+    equipment: {},
+  };
+}
+
 //===========================================================================
 
 export function useCatalogFilters(
@@ -73,14 +86,15 @@ export function useCatalogFilters(
   };
 
   const resetFilters = () => {
-    const next = cloneFilters(DEFAULT_CATALOG_FILTERS);
+    const next = resetOnlyCatalogFilters(filters);
+    const href = buildCatalogPath(next, 1);
 
-    setFiltersState(next);
+    setFiltersState(cloneFilters(next));
     setPageState(1);
-    lastHrefRef.current = '/catalog';
+    lastHrefRef.current = href;
 
     startTransition(() => {
-      router.replace('/catalog', { scroll: false });
+      router.replace(href, { scroll: false });
     });
   };
 

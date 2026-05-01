@@ -5,6 +5,8 @@ import { Filter } from 'lucide-react';
 
 import type { CatalogFiltersValue } from '@/lib/constants/catalogFilters';
 
+import { buildCatalogSeoText } from '@/lib/seo/catalogSeo';
+
 import { useCatalogCampers } from '@/hooks/useCatalogCampers';
 import { useCatalogFilters } from '@/hooks/useCatalogFilters';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -53,13 +55,13 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
   const { campers, total, totalPages, isLoading, isFetching } =
     useCatalogCampers(effectiveFilters, page);
 
-  const { favoriteIds, favoritesCount } = useFavorites();
+  const { favoriteIds, favoritesCount, hasHydrated } = useFavorites();
 
   const {
     data: favoriteItems = [],
     isLoading: isFavLoading,
     isFetching: isFavFetching,
-  } = useFavoriteCampers(favoriteIds, tab === 'favorites');
+  } = useFavoriteCampers(favoriteIds, hasHydrated && tab === 'favorites');
 
   const updateFilters = (patch: Partial<CatalogFiltersValue>) => {
     setFilters({
@@ -71,27 +73,31 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
 
   const visibleItems = tab === 'favorites' ? favoriteItems : campers;
 
+  const favoriteTabCount =
+    tab === 'favorites' && hasHydrated && !isFavLoading
+      ? favoriteItems.length
+      : favoritesCount;
+
   const tabs = [
     { value: 'all' as const, label: 'All', count: total },
     {
       value: 'favorites' as const,
       label: 'Favorites',
-      count:
-        tab === 'favorites' && !isFavLoading
-          ? favoriteItems.length
-          : favoritesCount,
+      count: hasHydrated ? favoriteTabCount : 0,
     },
   ];
 
   const isCatalogBusy = isPending || isFetching;
+  const isResetBusy = filtersApplied && isCatalogBusy;
+  const catalogSeoTitle = buildCatalogSeoText(effectiveFilters).title;
 
   const desktopFilters = (
     <CatalogFilters
       value={filters}
       onChange={setFilters}
       onReset={resetFilters}
-      isResetDisabled={!filtersApplied || isCatalogBusy}
-      isFiltering={isCatalogBusy}
+      isResetDisabled={!filtersApplied || isResetBusy}
+      isFiltering={isResetBusy}
       showSearch
       showSort={false}
       forms={filterOptions.forms}
@@ -105,8 +111,8 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
       value={filters}
       onChange={setFilters}
       onReset={resetFilters}
-      isResetDisabled={!filtersApplied || isCatalogBusy}
-      isFiltering={isCatalogBusy}
+      isResetDisabled={!filtersApplied || isResetBusy}
+      isFiltering={isResetBusy}
       showSearch={false}
       showSort
       forms={filterOptions.forms}
@@ -123,6 +129,8 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
         openFiltersRef.current = open;
       }}
     >
+      <h1 className={css.pageTitle}>{catalogSeoTitle}</h1>
+
       <div className={css.catalogTop}>
         <Tabs
           items={tabs}
@@ -157,16 +165,12 @@ function CatalogPageClient({ initialFilters, initialPage }: Props) {
         </Button>
       </div>
 
-      <h1 className="visually-hidden">
-        You can find everything you want in our catalog
-      </h1>
-
       <div className={css.listWrap}>
         <CampersList
           campers={visibleItems}
           isLoading={
             tab === 'favorites'
-              ? isFavLoading || isFavFetching
+              ? !hasHydrated || isFavLoading || isFavFetching
               : isLoading && tab === 'all'
           }
           emptyText={

@@ -18,7 +18,6 @@ import {
   formatAmenityLabel,
   formatCamperFormLabel,
   formatEngineLabel,
-  formatSortLabel,
   formatTransmissionLabel,
 } from '@/lib/constants/catalogFilters';
 
@@ -58,12 +57,13 @@ function slugify(value: string) {
     .trim()
     .toLowerCase()
     .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/['’]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
     .replace(/^-+|-+$/g, '');
 }
 
 function unslugify(value: string) {
-  return value.split('-').filter(Boolean).join(' ');
+  return value.split('-').filter(Boolean).join(' ').trim();
 }
 
 function formatSearchLabel(value: string) {
@@ -141,7 +141,12 @@ export function parseCatalogSegments(
   for (const segment of segments) {
     if (segment.startsWith(PREFIX.search)) {
       const slug = stripPrefix(segment, PREFIX.search);
-      filters.search = unslugify(slug);
+      const search = unslugify(slug);
+
+      if (search) {
+        filters.search = search;
+      }
+
       continue;
     }
 
@@ -238,7 +243,11 @@ export function buildCatalogPath(filters: CatalogFiltersValue, page = 1) {
   const location = filters.location.trim();
 
   if (search) {
-    segments.push(`${PREFIX.search}${slugify(search)}`);
+    const searchSlug = slugify(search);
+
+    if (searchSlug) {
+      segments.push(`${PREFIX.search}${searchSlug}`);
+    }
   }
 
   if (location) {
@@ -311,16 +320,7 @@ export function buildCatalogBreadcrumbs(
 
   let current: CatalogFiltersValue = cloneDefaultFilters();
 
-  const search = filters.search.trim();
   const location = filters.location.trim();
-
-  if (search) {
-    current = { ...current, search };
-    items.push({
-      label: `Search: ${search}`,
-      href: buildCatalogPath(current),
-    });
-  }
 
   if (location) {
     current = { ...current, location };
@@ -370,14 +370,6 @@ export function buildCatalogBreadcrumbs(
         label: formatAmenityLabel(amenity),
         href: buildCatalogPath(current),
       });
-    });
-  }
-
-  if (filters.sort) {
-    current = { ...current, sort: filters.sort };
-    items.push({
-      label: formatSortLabel(filters.sort),
-      href: buildCatalogPath(current),
     });
   }
 
