@@ -62,6 +62,7 @@ function Home() {
         alt=""
         fill
         priority
+        fetchPriority="high"
         sizes="100vw"
         className={css.bgImage}
       />

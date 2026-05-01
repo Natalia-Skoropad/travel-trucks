@@ -30,6 +30,7 @@ function NotFound() {
         fill
         sizes="100vw"
         priority
+        fetchPriority="high"
         className={`${css.bgImage} ${css.dimmedImage}`}
       />
 
