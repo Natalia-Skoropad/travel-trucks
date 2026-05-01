@@ -142,14 +142,17 @@ function BookingForm({ camperId }: Props) {
           onSubmit={handleSubmit}
         >
           {({
+            values,
             errors,
             touched,
             isSubmitting,
             isValid,
-            dirty,
             setFieldValue,
           }) => {
-            const canSubmit = isValid && dirty && !isSubmitting;
+            const hasRequiredValues =
+              Boolean(values.name.trim()) && Boolean(values.email.trim());
+
+            const canSubmit = isValid && hasRequiredValues && !isSubmitting;
 
             return (
               <Form className={css.form} noValidate>
