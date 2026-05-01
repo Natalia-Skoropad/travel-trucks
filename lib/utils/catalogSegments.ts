@@ -1,25 +1,26 @@
 import type { CamperAmenity } from '@/types/camper';
-import type { CamperSort, CampersQuery } from '@/types/catalog';
+import type { CampersQuery } from '@/types/catalog';
 
 import type {
   CatalogFiltersValue,
   EquipmentKey,
-  VehicleEngine,
-  VehicleForm,
-  VehicleTransmission,
 } from '@/lib/constants/catalogFilters';
 
 import {
   AMENITY_VALUES,
-  CAMPER_FORM_VALUES,
-  ENGINE_VALUES,
-  SORT_VALUES,
-  TRANSMISSION_VALUES,
   formatAmenityLabel,
   formatCamperFormLabel,
   formatEngineLabel,
   formatTransmissionLabel,
 } from '@/lib/constants/catalogFilters';
+
+import {
+  isCamperAmenity,
+  isCamperEngine,
+  isCamperForm,
+  isCamperSort,
+  isCamperTransmission,
+} from '@/lib/utils/catalogGuards';
 
 import { DEFAULT_CATALOG_FILTERS } from '@/lib/constants/catalogDefaults';
 import { CATALOG_PER_PAGE } from '@/lib/constants/pagination';
@@ -76,26 +77,6 @@ function formatSearchLabel(value: string) {
 
 function stripPrefix(segment: string, prefix: string) {
   return segment.startsWith(prefix) ? segment.slice(prefix.length) : '';
-}
-
-function isVehicleForm(value: string): value is VehicleForm {
-  return CAMPER_FORM_VALUES.includes(value as VehicleForm);
-}
-
-function isTransmission(value: string): value is VehicleTransmission {
-  return TRANSMISSION_VALUES.includes(value as VehicleTransmission);
-}
-
-function isEngine(value: string): value is VehicleEngine {
-  return ENGINE_VALUES.includes(value as VehicleEngine);
-}
-
-function isAmenity(value: string): value is CamperAmenity {
-  return AMENITY_VALUES.includes(value as CamperAmenity);
-}
-
-function isSort(value: string): value is CamperSort {
-  return SORT_VALUES.includes(value as CamperSort);
 }
 
 function findLocationBySlug(slug: string) {
@@ -161,7 +142,7 @@ export function parseCatalogSegments(
     if (segment.startsWith(PREFIX.form)) {
       const value = stripPrefix(segment, PREFIX.form);
 
-      if (isVehicleForm(value)) {
+      if (isCamperForm(value)) {
         filters.form = value;
       }
 
@@ -171,7 +152,7 @@ export function parseCatalogSegments(
     if (segment.startsWith(PREFIX.transmission)) {
       const value = stripPrefix(segment, PREFIX.transmission);
 
-      if (isTransmission(value)) {
+      if (isCamperTransmission(value)) {
         filters.transmission = value;
       }
 
@@ -181,16 +162,15 @@ export function parseCatalogSegments(
     if (segment.startsWith(PREFIX.engine)) {
       const value = stripPrefix(segment, PREFIX.engine);
 
-      if (isEngine(value)) {
+      if (isCamperEngine(value)) {
         filters.engine = value;
       }
-
       continue;
     }
 
     if (segment.startsWith(PREFIX.amenities)) {
       const rawValue = stripPrefix(segment, PREFIX.amenities);
-      const amenities = rawValue.split('-').filter(isAmenity);
+      const amenities = rawValue.split('-').filter(isCamperAmenity);
 
       amenities.forEach((amenity) => {
         filters.equipment[amenity] = true;
@@ -202,7 +182,7 @@ export function parseCatalogSegments(
     if (segment.startsWith(PREFIX.sort)) {
       const value = stripPrefix(segment, PREFIX.sort);
 
-      if (isSort(value)) {
+      if (isCamperSort(value)) {
         filters.sort = value;
       }
 

@@ -1,39 +1,21 @@
 import type {
   CatalogFiltersValue,
   EquipmentKey,
-  VehicleEngine,
-  VehicleForm,
-  VehicleTransmission,
 } from '@/lib/constants/catalogFilters';
 
 import {
-  AMENITY_VALUES,
-  CAMPER_FORM_VALUES,
-  ENGINE_VALUES,
-  TRANSMISSION_VALUES,
   formatAmenityLabel,
   formatCamperFormLabel,
   formatEngineLabel,
   formatTransmissionLabel,
 } from '@/lib/constants/catalogFilters';
 
-//===========================================================================
-
-function isVehicleForm(value: string): value is VehicleForm {
-  return CAMPER_FORM_VALUES.includes(value as VehicleForm);
-}
-
-function isEngine(value: string): value is VehicleEngine {
-  return ENGINE_VALUES.includes(value as VehicleEngine);
-}
-
-function isTransmission(value: string): value is VehicleTransmission {
-  return TRANSMISSION_VALUES.includes(value as VehicleTransmission);
-}
-
-function isEquipmentKey(value: string): value is EquipmentKey {
-  return AMENITY_VALUES.includes(value as EquipmentKey);
-}
+import {
+  isCamperAmenity,
+  isCamperEngine,
+  isCamperForm,
+  isCamperTransmission,
+} from '@/lib/utils/catalogGuards';
 
 //===========================================================================
 
@@ -50,7 +32,7 @@ export function filtersFromSearchParams(
     ? [formRaw]
     : [];
 
-  const form = formList.find(isVehicleForm) ?? '';
+  const form = formList.find(isCamperForm) ?? '';
 
   const engineRaw = searchParams.engine;
   const engineList = Array.isArray(engineRaw)
@@ -59,7 +41,7 @@ export function filtersFromSearchParams(
     ? [engineRaw]
     : [];
 
-  const engine = engineList.find(isEngine) ?? '';
+  const engine = engineList.find(isCamperEngine) ?? '';
 
   const transmissionRaw = searchParams.transmission;
   const transmissionList = Array.isArray(transmissionRaw)
@@ -68,7 +50,7 @@ export function filtersFromSearchParams(
     ? [transmissionRaw]
     : [];
 
-  const transmission = transmissionList.find(isTransmission) ?? '';
+  const transmission = transmissionList.find(isCamperTransmission) ?? '';
 
   const equipment: Partial<Record<EquipmentKey, boolean>> = {};
 
@@ -80,7 +62,7 @@ export function filtersFromSearchParams(
     : [];
 
   equipmentList.forEach((key) => {
-    if (isEquipmentKey(key)) {
+    if (isCamperAmenity(key)) {
       equipment[key] = true;
     }
   });

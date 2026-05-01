@@ -1,45 +1,11 @@
+import type { CamperAmenity, CamperDetails } from '@/types/camper';
+
 import {
-  AMENITY_VALUES,
-  CAMPER_FORM_VALUES,
-  ENGINE_VALUES,
-  TRANSMISSION_VALUES,
-} from '@/lib/constants/catalogFilters';
-
-import type {
-  CamperAmenity,
-  CamperDetails,
-  CamperEngine,
-  CamperForm,
-  CamperTransmission,
-} from '@/types/camper';
-
-//===========================================================================
-
-function isCamperAmenity(value: unknown): value is CamperAmenity {
-  return (
-    typeof value === 'string' && AMENITY_VALUES.includes(value as CamperAmenity)
-  );
-}
-
-function isCamperForm(value: unknown): value is CamperForm {
-  return (
-    typeof value === 'string' &&
-    CAMPER_FORM_VALUES.includes(value as CamperForm)
-  );
-}
-
-function isCamperTransmission(value: unknown): value is CamperTransmission {
-  return (
-    typeof value === 'string' &&
-    TRANSMISSION_VALUES.includes(value as CamperTransmission)
-  );
-}
-
-function isCamperEngine(value: unknown): value is CamperEngine {
-  return (
-    typeof value === 'string' && ENGINE_VALUES.includes(value as CamperEngine)
-  );
-}
+  isCamperAmenity,
+  isCamperEngine,
+  isCamperForm,
+  isCamperTransmission,
+} from '@/lib/utils/catalogGuards';
 
 //===========================================================================
 

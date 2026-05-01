@@ -7,8 +7,15 @@ import {
   isBackendNotFoundError,
 } from '@/lib/server/campersCatalogService';
 
-import type { CamperAmenity } from '@/types/camper';
-import type { CamperSort, CampersQuery } from '@/types/catalog';
+import {
+  isCamperAmenity,
+  isCamperEngine,
+  isCamperForm,
+  isCamperSort,
+  isCamperTransmission,
+} from '@/lib/utils/catalogGuards';
+
+import type { CampersQuery } from '@/types/catalog';
 
 //===========================================================================
 
@@ -23,21 +30,32 @@ function toPositiveNumber(value: string | null) {
 }
 
 function getEquipmentFromSearchParams(searchParams: URLSearchParams) {
-  return searchParams.getAll('equipment') as CamperAmenity[];
+  return searchParams.getAll('equipment').filter(isCamperAmenity);
+}
+
+function getSearchFromSearchParams(searchParams: URLSearchParams) {
+  const search = searchParams.get('search')?.trim();
+
+  return search || undefined;
 }
 
 function getQueryFromSearchParams(searchParams: URLSearchParams): CampersQuery {
+  const form = searchParams.get('form');
+  const transmission = searchParams.get('transmission');
+  const engine = searchParams.get('engine');
+  const sort = searchParams.get('sort');
+
   return {
     page: toPositiveNumber(searchParams.get('page')),
     perPage: toPositiveNumber(searchParams.get('perPage')),
-    location: searchParams.get('location') || undefined,
-    form: searchParams.get('form') as CampersQuery['form'],
-    transmission: searchParams.get(
-      'transmission'
-    ) as CampersQuery['transmission'],
-    engine: searchParams.get('engine') as CampersQuery['engine'],
-    search: searchParams.get('search') || undefined,
-    sort: searchParams.get('sort') as CamperSort | undefined,
+    location: searchParams.get('location')?.trim() || undefined,
+
+    form: isCamperForm(form) ? form : undefined,
+    transmission: isCamperTransmission(transmission) ? transmission : undefined,
+    engine: isCamperEngine(engine) ? engine : undefined,
+
+    search: getSearchFromSearchParams(searchParams),
+    sort: isCamperSort(sort) ? sort : undefined,
     equipment: getEquipmentFromSearchParams(searchParams),
   };
 }
