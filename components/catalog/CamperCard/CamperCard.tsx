@@ -4,14 +4,15 @@ import { useState } from 'react';
 import clsx from 'clsx';
 
 import type { CamperListItem } from '@/types/camper';
+
 import {
   buildFeatureBadges,
   formatEngine,
   formatTransmission,
   formatVehicleForm,
 } from '@/lib/utils/camperBadges';
-import { useFavorites } from '@/hooks/useFavorites';
 
+import { useFavorites } from '@/hooks/useFavorites';
 import { buildCamperHref } from '@/lib/utils/camperSlug';
 
 import RatingLocation from '@/components/common/RatingLocation/RatingLocation';
@@ -32,23 +33,9 @@ type Props = {
 
 //===============================================================
 
-function buildShortDescription(item: CamperListItem) {
-  const details = [
-    formatVehicleForm(item.form),
-    formatTransmission(item.transmission),
-    formatEngine(item.engine),
-    item.length,
-  ].filter(Boolean);
-
-  return details.join(' • ');
-}
-
-//===============================================================
-
 function CamperCard({ item, className }: Props) {
   const imageSrc = item.coverImage || '/images/placeholder.jpg';
 
-  const description = buildShortDescription(item);
   const badges = buildFeatureBadges(item);
   const reviewsCount = item.totalReviews ?? 0;
 
@@ -90,36 +77,47 @@ function CamperCard({ item, className }: Props) {
         size="lg"
       />
 
-      <div className={css.top}>
-        <div className={css.media}>
-          <ShimmerImage
-            as="span"
-            src={imageSrc}
-            alt={item.name}
-            sizes="(max-width: 767px) 100vw, (max-width: 1439px) 265px, 360px"
-            className={css.image}
-          />
-        </div>
-
-        <div className={css.content}>
-          <header className={css.header}>
-            <h2 className={css.title}>{item.name}</h2>
-            <span className={css.price}>€{item.price.toFixed(2)}</span>
-          </header>
-
-          <RatingLocation
-            rating={item.rating ?? 0}
-            reviewsCount={reviewsCount}
-            location={item.location ?? ''}
-          />
-
-          {description ? (
-            <p className={css.description}>{description}</p>
-          ) : null}
-        </div>
+      <div className={css.media}>
+        <ShimmerImage
+          as="span"
+          src={imageSrc}
+          alt={item.name}
+          sizes="(max-width: 767px) 100vw, (max-width: 1439px) 265px, 310px"
+          className={css.image}
+        />
       </div>
 
-      <div className={css.bottom}>
+      <div className={css.content}>
+        <header className={css.header}>
+          <h2 className={css.title}>{item.name}</h2>
+          <span className={css.price}>€{item.price.toFixed(2)}</span>
+        </header>
+
+        <RatingLocation
+          rating={item.rating ?? 0}
+          reviewsCount={reviewsCount}
+          location={item.location ?? ''}
+        />
+
+        <dl className={css.specs} aria-label="Camper main specifications">
+          <div className={css.spec}>
+            <dt className={css.specLabel}>Camper form:</dt>
+            <dd className={css.specValue}>{formatVehicleForm(item.form)}</dd>
+          </div>
+
+          <div className={css.spec}>
+            <dt className={css.specLabel}>Engine:</dt>
+            <dd className={css.specValue}>{formatEngine(item.engine)}</dd>
+          </div>
+
+          <div className={css.spec}>
+            <dt className={css.specLabel}>Transmission:</dt>
+            <dd className={css.specValue}>
+              {formatTransmission(item.transmission)}
+            </dd>
+          </div>
+        </dl>
+
         <FeatureBadges items={badges} className={css.badges} />
 
         <div className={css.actions}>
