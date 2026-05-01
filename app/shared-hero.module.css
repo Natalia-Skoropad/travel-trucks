@@ -1,6 +1,6 @@
 .page {
   position: relative;
-  min-height: calc(100vh - 88px);
+  min-height: calc(100vh - 60px);
   overflow: hidden;
 
   background: linear-gradient(
@@ -26,7 +26,7 @@
   display: flex;
   align-items: center;
 
-  min-height: calc(100vh - 88px);
+  min-height: calc(100vh - 60px);
   padding: 72px 0;
 }
 
@@ -84,7 +84,7 @@
   display: inline-flex;
   align-items: center;
 
-  margin-bottom: 18px;
+  margin-bottom: 25px;
   padding: 8px 16px;
 
   border-radius: var(--radius-pill);
@@ -308,7 +308,6 @@
 
   .notFoundCode {
     margin-bottom: 12px;
-    font-size: 120px;
   }
 }
 
@@ -322,8 +321,8 @@
   }
 
   .homeHero {
-    grid-template-columns: minmax(0, 1fr) 480px;
-    gap: 72px;
+    grid-template-columns: minmax(0, 1fr) 600px;
+    gap: 40px;
   }
 
   .homeContent {
@@ -332,11 +331,11 @@
 
   .title {
     margin-bottom: 20px;
-    font-size: 60px;
+    font-size: 50px;
   }
 
   .text {
     margin-bottom: 40px;
-    font-size: 20px;
+    font-size: 18px;
   }
 }
