@@ -15,6 +15,8 @@ import {
   isCamperTransmission,
 } from '@/lib/utils/catalogGuards';
 
+import { normalizeCampersResponse } from '@/lib/utils/normalizeCamper';
+
 import type {
   CamperAmenity,
   CamperEngine,
@@ -64,19 +66,6 @@ function normalizeText(value: unknown) {
   return typeof value === 'string' ? value.trim().toLowerCase() : '';
 }
 
-function normalizeCampersResponse(data: unknown): CampersResponse {
-  const value = data as Partial<CampersResponse>;
-
-  return {
-    page: typeof value.page === 'number' ? value.page : DEFAULT_PAGE,
-    perPage:
-      typeof value.perPage === 'number' ? value.perPage : CATALOG_PER_PAGE,
-    total: typeof value.total === 'number' ? value.total : 0,
-    totalPages: typeof value.totalPages === 'number' ? value.totalPages : 0,
-    campers: Array.isArray(value.campers) ? value.campers : [],
-  };
-}
-
 //===========================================================================
 
 function normalizeEquipment(value: CampersQuery['equipment']) {
@@ -106,7 +95,15 @@ function getEnhancementParams(params?: CampersQuery): CatalogEnhancementParams {
   };
 }
 
-function shouldUseBffEnhancements({
+/**
+ * The backend currently supports page, perPage, location, form,
+ * transmission and engine filters directly.
+ *
+ * Search, sort and equipment filtering are handled in this BFF layer,
+ * so the catalog is aggregated first and then enhanced locally before
+ * being paginated again for the client.
+ */
+function shouldAggregateCatalog({
   search,
   sort,
   equipment,
@@ -225,7 +222,7 @@ export async function getCampersCatalogResponse(
   const backendParams = getBackendParams(params);
   const enhancementParams = getEnhancementParams(params);
 
-  if (!shouldUseBffEnhancements(enhancementParams)) {
+  if (!shouldAggregateCatalog(enhancementParams)) {
     return fetchBackendCampers(backendParams);
   }
 

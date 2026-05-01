@@ -1,14 +1,19 @@
 import axios from 'axios';
 
 import { campersServerApi, nextApi } from '@/lib/api/api';
+
 import {
   buildEmptyCampersResponse,
   getCampersCatalogResponse,
   isBackendNotFoundError,
 } from '@/lib/server/campersCatalogService';
 
+import {
+  normalizeCamperDetails,
+  normalizeCampersResponse,
+} from '@/lib/utils/normalizeCamper';
+
 import type { CamperDetails } from '@/types/camper';
-import { normalizeCamperDetails } from '@/lib/utils/normalizeCamper';
 
 import type {
   BookingRequestPayload,
@@ -22,20 +27,6 @@ import type {
 } from '@/types/catalog';
 
 import type { Review } from '@/types/review';
-
-//===========================================================================
-
-function normalizeCampersResponse(data: unknown): CampersResponse {
-  const value = data as Partial<CampersResponse>;
-
-  return {
-    page: typeof value.page === 'number' ? value.page : 1,
-    perPage: typeof value.perPage === 'number' ? value.perPage : 0,
-    total: typeof value.total === 'number' ? value.total : 0,
-    totalPages: typeof value.totalPages === 'number' ? value.totalPages : 0,
-    campers: Array.isArray(value.campers) ? value.campers : [],
-  };
-}
 
 //===========================================================================
 // Catalog list
