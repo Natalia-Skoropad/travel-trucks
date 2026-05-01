@@ -17,7 +17,7 @@ import css from './shared-hero.module.css';
 const HOME_TITLE = 'Campers of your dreams';
 
 const HOME_DESCRIPTION =
-  'Discover and rent campers for your next adventure. Browse the catalog, explore features, read reviews, and book your camper with TravelTrucks.';
+  'Discover TravelTrucks — a camper rental catalog where you can browse vehicles, compare features, check reviews, save favorites, and book the right camper for your next road trip.';
 
 //===========================================================================
 
@@ -28,6 +28,29 @@ export const metadata = buildMetadata({
   image: DEFAULT_OG_IMAGE,
   imageAlt: DEFAULT_OG_ALT,
 });
+
+//===========================================================================
+
+const FEATURES = [
+  {
+    title: 'Smart catalog',
+    text: 'Browse campers by location, vehicle form, transmission, engine type, and equipment.',
+  },
+  {
+    title: 'Detailed camper pages',
+    text: 'Explore photos, specifications, reviews, ratings, and booking details before making a choice.',
+  },
+  {
+    title: 'Favorites list',
+    text: 'Save campers you like and return to them later without losing your shortlist.',
+  },
+];
+
+const STATS = [
+  { value: '20+', label: 'campers in catalog' },
+  { value: '9', label: 'equipment filters' },
+  { value: '4', label: 'vehicle forms' },
+];
 
 //===========================================================================
 
@@ -43,16 +66,61 @@ function Home() {
         className={css.bgImage}
       />
 
+      <div className={css.overlay} />
+
       <div className="container">
-        <div className={`${css.heroContent} ${css.homeContent}`}>
-          <h1 className={css.title}>Campers of your dreams</h1>
+        <section className={css.homeHero} aria-labelledby="home-title">
+          <div className={css.homeContent}>
+            <p className={css.eyebrow}>Camper rental made simple</p>
 
-          <p className={css.text}>
-            You can find everything you want in our catalog
-          </p>
+            <h1 id="home-title" className={css.title}>
+              Campers of your dreams
+            </h1>
 
-          <ButtonLink href={ROUTES.CATALOG}>View Now</ButtonLink>
-        </div>
+            <p className={css.text}>
+              TravelTrucks helps you find the right camper for your next road
+              trip. Compare vehicles, check equipment, read reviews, save your
+              favorites, and send a booking request in a few clicks.
+            </p>
+
+            <div className={css.actions}>
+              <ButtonLink href={ROUTES.CATALOG}>View Now</ButtonLink>
+            </div>
+          </div>
+
+          <aside className={css.infoPanel} aria-label="TravelTrucks features">
+            <div className={css.panelHeader}>
+              <p className={css.panelKicker}>Why TravelTrucks?</p>
+              <h2 className={css.panelTitle}>
+                Everything you need to choose confidently
+              </h2>
+            </div>
+
+            <ul className={css.features}>
+              {FEATURES.map((feature) => (
+                <li key={feature.title} className={css.feature}>
+                  <span className={css.featureMark} aria-hidden="true">
+                    ✓
+                  </span>
+
+                  <div>
+                    <h3 className={css.featureTitle}>{feature.title}</h3>
+                    <p className={css.featureText}>{feature.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <ul className={css.stats} aria-label="TravelTrucks quick facts">
+              {STATS.map((item) => (
+                <li key={item.label} className={css.stat}>
+                  <strong className={css.statValue}>{item.value}</strong>
+                  <span className={css.statLabel}>{item.label}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        </section>
       </div>
     </main>
   );
